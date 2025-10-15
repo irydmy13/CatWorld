@@ -1,15 +1,28 @@
+using System.Globalization;
+using CatWorld.Resources.Localization;
+
 namespace CatWorld.Services;
 
-public class LocalizationService : ContentPage
+public interface ILocalizationService
 {
-	public LocalizationService()
-	{
-		Content = new VerticalStackLayout
-		{
-			Children = {
-				new Label { HorizontalOptions = LayoutOptions.Center, VerticalOptions = LayoutOptions.Center, Text = "Welcome to .NET MAUI!"
-				}
-			}
-		};
-	}
+    CultureInfo CurrentCulture { get; }
+    void SetCulture(string cultureName); // "en", "et"
+    event EventHandler? LanguageChanged;
+}
+
+public class LocalizationService : ILocalizationService
+{
+    public CultureInfo CurrentCulture { get; private set; } = CultureInfo.CurrentUICulture;
+    public event EventHandler? LanguageChanged;
+
+    public void SetCulture(string cultureName)
+    {
+        var culture = new CultureInfo(cultureName);
+        CultureInfo.CurrentCulture = culture;
+        CultureInfo.CurrentUICulture = culture;
+        Thread.CurrentThread.CurrentCulture = culture;
+        Thread.CurrentThread.CurrentUICulture = culture;
+        Preferences.Set("lang", cultureName);
+        LanguageChanged?.Invoke(this, EventArgs.Empty);
+    }
 }

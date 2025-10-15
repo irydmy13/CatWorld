@@ -1,12 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using SQLite;
 
-namespace CatWorld.Models
+namespace CatWorld.Models;
+
+public class Toy
 {
-    internal class Toy
-    {
-    }
+    [PrimaryKey, AutoIncrement]
+    public int Id { get; set; }
+
+    public string Name { get; set; } = "";
+    public string Icon { get; set; } = "toy_ball.png"; // путь к картинке
+    public int Fun { get; set; } = 10;                 // сколько радости даёт
 }

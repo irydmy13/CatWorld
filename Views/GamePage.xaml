@@ -1,12 +1,71 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+<ContentPage x:Class="CatWorld.Views.GamePage"
+             xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             x:Class="CatWorld.Views.GamePage"
-             Title="GamePage">
-    <VerticalStackLayout>
-        <Label 
-            Text="Welcome to .NET MAUI!"
-            VerticalOptions="Center" 
-            HorizontalOptions="Center" />
-    </VerticalStackLayout>
+             xmlns:vm="clr-namespace:CatWorld.ViewModels"
+             xmlns:res="clr-namespace:CatWorld.Resources.Localization"
+
+    <ContentPage.BindingContext>
+        <vm:GameViewModel />
+    </ContentPage.BindingContext>
+
+    <Grid RowDefinitions="*,Auto">
+        <!-- Игровая зона -->
+        <Grid Grid.Row="0">
+            <Grid.Background>
+                <ImageBrush>
+                    <ImageBrush.ImageSource>
+                        <AppThemeImageSource Light="bg_day.png" Dark="bg_night.png" />
+                    </ImageBrush.ImageSource>
+                </ImageBrush>
+            </Grid.Background>
+
+            <!-- Drop-зона -->
+            <AbsoluteLayout x:Name="PlayArea">
+                <!-- Кот -->
+                <Image x:Name="Cat"
+               Source="cat.png"
+               WidthRequest="120" HeightRequest="120"
+               TranslationX="{Binding CatX}"
+               TranslationY="{Binding CatY}">
+                    <Image.GestureRecognizers>
+                        <!-- тап по области заставляет кота идти в точку -->
+                        <TapGestureRecognizer NumberOfTapsRequired="1"
+                                  Tapped="OnPlayAreaTapped"/>
+                    </Image.GestureRecognizers>
+                </Image>
+
+                <!-- Drop-обработчик на область -->
+                <AbsoluteLayout.GestureRecognizers>
+                    <DropGestureRecognizer Drop="OnDropToy" />
+                    <TapGestureRecognizer NumberOfTapsRequired="1" Tapped="OnPlayAreaTapped"/>
+                </AbsoluteLayout.GestureRecognizers>
+            </AbsoluteLayout>
+        </Grid>
+
+        <!-- Панель игрушек -->
+        <CollectionView Grid.Row="1"
+                    ItemsSource="{Binding Toys}"
+                    ItemsLayout="HorizontalList"
+                    HeightRequest="110"
+                    Margin="10">
+            <CollectionView.ItemTemplate>
+                <DataTemplate>
+                    <Grid Padding="6">
+                        <Frame Padding="8" HasShadow="True" CornerRadius="12">
+                            <StackLayout>
+                                <Image Source="{Binding Icon}" WidthRequest="64" HeightRequest="64">
+                                    <Image.GestureRecognizers>
+                                        <DragGestureRecognizer CanDrag="True"
+                                           DragStarting="OnToyDragStarting"/>
+                                    </Image.GestureRecognizers>
+                                </Image>
+                                <Label Text="{Binding Name}" HorizontalOptions="Center" />
+                            </StackLayout>
+                        </Frame>
+                    </Grid>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+    </Grid>
 </ContentPage>

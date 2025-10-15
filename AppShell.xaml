@@ -1,14 +1,11 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <Shell
-    x:Class="CatWorld.AppShell"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
-    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-    xmlns:local="clr-namespace:CatWorld"
-    Title="CatWorld">
-
-    <ShellContent
-        Title="Home"
-        ContentTemplate="{DataTemplate local:MainPage}"
-        Route="MainPage" />
-
+    x:Class="CatWorld.AppShell"
+    Shell.FlyoutBehavior="Disabled">
+    <TabBar>
+        <ShellContent Title="{x:Static resources:AppResources.Title}" ContentTemplate="{DataTemplate views:GamePage}" />
+        <ShellContent Title="{x:Static resources:AppResources.Settings}" ContentTemplate="{DataTemplate views:SettingsPage}" />
+        <ShellContent Title="{x:Static resources:AppResources.Stats}" ContentTemplate="{DataTemplate views:StatsPage}" />
+    </TabBar>
 </Shell>

@@ -1,12 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using SQLite;
 
-namespace CatWorld.Models
+namespace CatWorld.Models;
+
+public class GameStat
 {
-    internal class GameStat
-    {
-    }
+    [PrimaryKey, AutoIncrement]
+    public int Id { get; set; }
+
+    public int ToysCaught { get; set; }
+    public int Score { get; set; }
+    public long TotalPlaySeconds { get; set; }
+    public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
 }

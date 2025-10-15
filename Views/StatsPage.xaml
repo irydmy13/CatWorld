@@ -1,12 +1,21 @@
-<?xml version="1.0" encoding="utf-8" ?>
-<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+<ContentPage x:Class="CatWorld.Views.StatsPage"
+             xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             x:Class="CatWorld.Views.StatsPage"
-             Title="StatsPage">
-    <VerticalStackLayout>
-        <Label 
-            Text="Welcome to .NET MAUI!"
-            VerticalOptions="Center" 
-            HorizontalOptions="Center" />
+             xmlns:vm="clr-namespace:CatWorld.ViewModels"
+             xmlns:res="clr-namespace:CatWorld.Resources.Localization"
+             Title="{x:Static res:AppResources.Stats}">
+    <ContentPage.BindingContext>
+        <vm:StatsViewModel />
+    </ContentPage.BindingContext>
+
+    <VerticalStackLayout Padding="20" Spacing="10">
+        <Label Text="{x:Static res:AppResources.ToysCaught}" />
+        <Label Text="{Binding Toys}" FontSize="24" />
+
+        <Label Text="{x:Static res:AppResources.Score}" />
+        <Label Text="{Binding Score}" FontSize="24" />
+
+        <Label Text="Play time (s)" />
+        <Label Text="{Binding Seconds}" FontSize="24" />
     </VerticalStackLayout>
 </ContentPage>
