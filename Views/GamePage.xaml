@@ -10,15 +10,12 @@
     <Grid RowDefinitions="*,Auto">
         <!-- Игровая зона -->
         <Grid Grid.Row="0">
-            <Grid.Background>
-                <ImageBrush>
-                    <ImageBrush.ImageSource>
-                        <AppThemeImageSource Light="bg_day.png" Dark="bg_night.png" />
-                    </ImageBrush.ImageSource>
-                </ImageBrush>
-            </Grid.Background>
+            <Image
+      Aspect="AspectFill"
+      InputTransparent="True"
+      Source="{AppThemeBinding Light=bg_day.png, Dark=bg_night.png}" />
 
-            <!-- Drop-зона -->
+           <!-- Drop-зона -->
             <AbsoluteLayout x:Name="PlayArea">
                 <!-- Кот -->
                 <Image x:Name="Cat"

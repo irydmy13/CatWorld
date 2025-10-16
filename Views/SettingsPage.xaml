@@ -2,7 +2,9 @@
 <ContentPage x:Class="CatWorld.Views.SettingsPage"
              xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             xmlns:vm="clr-namespace:CatWorld.ViewModels">
+             xmlns:res="clr-namespace:CatWorld.Resources.Localization"
+             xmlns:vm="clr-namespace:CatWorld.ViewModels"
+             Title="{x:Static res:AppResources.Settings}">
 
 
     <VerticalStackLayout Padding="16" Spacing="14">

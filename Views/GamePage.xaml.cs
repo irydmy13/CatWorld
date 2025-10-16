@@ -1,3 +1,5 @@
+using CatWorld.ViewModels;
+
 namespace CatWorld.Views;
 
 public partial class GamePage : ContentPage

@@ -84,12 +84,23 @@
 	    <AutoGen>True</AutoGen>
 	    <DependentUpon>AppResources.resx</DependentUpon>
 	  </Compile>
+	  <Compile Update="Resources\Localization\AppResources.et.Designer.cs">
+	    <DesignTime>True</DesignTime>
+	    <AutoGen>True</AutoGen>
+	    <DependentUpon>AppResources.et.resx</DependentUpon>
+	  </Compile>
 	</ItemGroup>
 
 	<ItemGroup>
-	  <EmbeddedResource Update="Resources\Localization\AppResources.et.resx">
-	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-	  </EmbeddedResource>
+		<EmbeddedResource Update="Resources/Localization/AppResources.resx">
+			<Generator>PublicResXFileCodeGenerator</Generator>
+			<CustomToolNamespace>CatWorld.Resources.Localization</CustomToolNamespace>
+			<LastGenOutput>AppResources.Designer.cs</LastGenOutput>
+		</EmbeddedResource>
+		<EmbeddedResource Update="Resources/Localization/AppResources.et.resx">
+			<Generator>PublicResXFileCodeGenerator</Generator>
+			<CustomToolNamespace>CatWorld.Resources.Localization</CustomToolNamespace>
+		</EmbeddedResource>
 	</ItemGroup>
 
 	<ItemGroup>
@@ -102,18 +113,6 @@
 	  <MauiXaml Update="Views\StatsPage.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
-	</ItemGroup>
-
-	<ItemGroup>
-		<EmbeddedResource Update="Resources/Localization/AppResources.resx">
-			<Generator>ResXFileCodeGenerator</Generator>
-			<CustomToolNamespace>CatWorld.Resources.Localization</CustomToolNamespace>
-			<LastGenOutput>AppResources.Designer.cs</LastGenOutput>
-		</EmbeddedResource>
-		<EmbeddedResource Update="Resources/Localization/AppResources.et.resx">
-			<Generator>ResXFileCodeGenerator</Generator>
-			<CustomToolNamespace>CatWorld.Resources.Localization</CustomToolNamespace>
-		</EmbeddedResource>
 	</ItemGroup>
 
 </Project>

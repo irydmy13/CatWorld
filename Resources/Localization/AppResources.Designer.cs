@@ -22,7 +22,7 @@ namespace CatWorld.Resources.Localization {
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "17.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    internal class AppResources {
+    public class AppResources {
         
         private static global::System.Resources.ResourceManager resourceMan;
         
@@ -36,7 +36,7 @@ namespace CatWorld.Resources.Localization {
         ///   Возвращает кэшированный экземпляр ResourceManager, использованный этим классом.
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        internal static global::System.Resources.ResourceManager ResourceManager {
+        public static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
                     global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("CatWorld.Resources.Localization.AppResources", typeof(AppResources).Assembly);
@@ -51,7 +51,7 @@ namespace CatWorld.Resources.Localization {
         ///   обращений к ресурсу с помощью этого класса ресурса со строгой типизацией.
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        internal static global::System.Globalization.CultureInfo Culture {
+        public static global::System.Globalization.CultureInfo Culture {
             get {
                 return resourceCulture;
             }
@@ -63,7 +63,7 @@ namespace CatWorld.Resources.Localization {
         /// <summary>
         ///   Ищет локализованную строку, похожую на Dark.
         /// </summary>
-        internal static string Dark {
+        public static string Dark {
             get {
                 return ResourceManager.GetString("Dark", resourceCulture);
             }
@@ -72,7 +72,7 @@ namespace CatWorld.Resources.Localization {
         /// <summary>
         ///   Ищет локализованную строку, похожую на Language.
         /// </summary>
-        internal static string Language {
+        public static string Language {
             get {
                 return ResourceManager.GetString("Language", resourceCulture);
             }
@@ -81,7 +81,7 @@ namespace CatWorld.Resources.Localization {
         /// <summary>
         ///   Ищет локализованную строку, похожую на Light.
         /// </summary>
-        internal static string Light {
+        public static string Light {
             get {
                 return ResourceManager.GetString("Light", resourceCulture);
             }
@@ -90,7 +90,7 @@ namespace CatWorld.Resources.Localization {
         /// <summary>
         ///   Ищет локализованную строку, похожую на Play.
         /// </summary>
-        internal static string Play {
+        public static string Play {
             get {
                 return ResourceManager.GetString("Play", resourceCulture);
             }
@@ -99,7 +99,7 @@ namespace CatWorld.Resources.Localization {
         /// <summary>
         ///   Ищет локализованную строку, похожую на Score.
         /// </summary>
-        internal static string Score {
+        public static string Score {
             get {
                 return ResourceManager.GetString("Score", resourceCulture);
             }
@@ -108,7 +108,7 @@ namespace CatWorld.Resources.Localization {
         /// <summary>
         ///   Ищет локализованную строку, похожую на Settings.
         /// </summary>
-        internal static string Settings {
+        public static string Settings {
             get {
                 return ResourceManager.GetString("Settings", resourceCulture);
             }
@@ -117,7 +117,7 @@ namespace CatWorld.Resources.Localization {
         /// <summary>
         ///   Ищет локализованную строку, похожую на Sound.
         /// </summary>
-        internal static string Sound {
+        public static string Sound {
             get {
                 return ResourceManager.GetString("Sound", resourceCulture);
             }
@@ -126,7 +126,7 @@ namespace CatWorld.Resources.Localization {
         /// <summary>
         ///   Ищет локализованную строку, похожую на Stats.
         /// </summary>
-        internal static string Stats {
+        public static string Stats {
             get {
                 return ResourceManager.GetString("Stats", resourceCulture);
             }
@@ -135,7 +135,7 @@ namespace CatWorld.Resources.Localization {
         /// <summary>
         ///   Ищет локализованную строку, похожую на Theme.
         /// </summary>
-        internal static string Theme {
+        public static string Theme {
             get {
                 return ResourceManager.GetString("Theme", resourceCulture);
             }
@@ -144,7 +144,7 @@ namespace CatWorld.Resources.Localization {
         /// <summary>
         ///   Ищет локализованную строку, похожую на CatWorld.
         /// </summary>
-        internal static string Title {
+        public static string Title {
             get {
                 return ResourceManager.GetString("Title", resourceCulture);
             }
@@ -153,7 +153,7 @@ namespace CatWorld.Resources.Localization {
         /// <summary>
         ///   Ищет локализованную строку, похожую на Toys caught.
         /// </summary>
-        internal static string ToysCaught {
+        public static string ToysCaught {
             get {
                 return ResourceManager.GetString("ToysCaught", resourceCulture);
             }
