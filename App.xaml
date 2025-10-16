@@ -9,11 +9,8 @@
         <Color x:Key="BgColorDark">#1C1C1E</Color>
 
         <Style TargetType="ContentPage">
-            <Setter Property="BackgroundColor">
-                <Setter.Value>
-                    <AppThemeColor Light="{StaticResource BgColorLight}" Dark="{StaticResource BgColorDark}" />
-                </Setter.Value>
-            </Setter>
+            <Setter Property="BackgroundColor"
+              Value="{AppThemeBinding Light={StaticResource BgColorLight}, Dark={StaticResource BgColorDark}}" />
         </Style>
     </Application.Resources>
 </Application>
