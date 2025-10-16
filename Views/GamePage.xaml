@@ -6,9 +6,6 @@
              xmlns:res="clr-namespace:CatWorld.Resources.Localization"
              Title="{x:Static res:AppResources.Title}">
 
-    <ContentPage.BindingContext>
-        <vm:GameViewModel />
-    </ContentPage.BindingContext>
 
     <Grid RowDefinitions="*,Auto">
         <!-- Игровая зона -->

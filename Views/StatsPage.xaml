@@ -4,10 +4,8 @@
              xmlns:vm="clr-namespace:CatWorld.ViewModels"
              xmlns:res="clr-namespace:CatWorld.Resources.Localization"
              Title="{x:Static res:AppResources.Stats}">
-    <ContentPage.BindingContext>
-        <vm:StatsViewModel />
-    </ContentPage.BindingContext>
 
+    
     <VerticalStackLayout Padding="20" Spacing="10">
         <Label Text="{x:Static res:AppResources.ToysCaught}" />
         <Label Text="{Binding Toys}" FontSize="24" />

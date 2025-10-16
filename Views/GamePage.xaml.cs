@@ -2,8 +2,9 @@ namespace CatWorld.Views;
 
 public partial class GamePage : ContentPage
 {
-	public GamePage()
+	public GamePage(GameViewModel vm)
 	{
 		InitializeComponent();
-	}
+        BindingContext = vm;
+    }
 }
