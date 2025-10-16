@@ -61,7 +61,7 @@ namespace CatWorld.Resources.Localization {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Tume.
+        ///   Ищет локализованную строку, похожую на Dark.
         /// </summary>
         internal static string Dark {
             get {
@@ -70,7 +70,7 @@ namespace CatWorld.Resources.Localization {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Keel.
+        ///   Ищет локализованную строку, похожую на Language.
         /// </summary>
         internal static string Language {
             get {
@@ -79,7 +79,7 @@ namespace CatWorld.Resources.Localization {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Hele.
+        ///   Ищет локализованную строку, похожую на Light.
         /// </summary>
         internal static string Light {
             get {
@@ -88,7 +88,7 @@ namespace CatWorld.Resources.Localization {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Mängi.
+        ///   Ищет локализованную строку, похожую на Play.
         /// </summary>
         internal static string Play {
             get {
@@ -97,7 +97,7 @@ namespace CatWorld.Resources.Localization {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Punktid.
+        ///   Ищет локализованную строку, похожую на Score.
         /// </summary>
         internal static string Score {
             get {
@@ -106,7 +106,7 @@ namespace CatWorld.Resources.Localization {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Seaded.
+        ///   Ищет локализованную строку, похожую на Settings.
         /// </summary>
         internal static string Settings {
             get {
@@ -115,7 +115,7 @@ namespace CatWorld.Resources.Localization {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Heli.
+        ///   Ищет локализованную строку, похожую на Sound.
         /// </summary>
         internal static string Sound {
             get {
@@ -124,7 +124,7 @@ namespace CatWorld.Resources.Localization {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Statistika.
+        ///   Ищет локализованную строку, похожую на Stats.
         /// </summary>
         internal static string Stats {
             get {
@@ -133,7 +133,7 @@ namespace CatWorld.Resources.Localization {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Teema.
+        ///   Ищет локализованную строку, похожую на Theme.
         /// </summary>
         internal static string Theme {
             get {
@@ -142,7 +142,7 @@ namespace CatWorld.Resources.Localization {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на KassiMaailm.
+        ///   Ищет локализованную строку, похожую на CatWorld.
         /// </summary>
         internal static string Title {
             get {
@@ -151,7 +151,7 @@ namespace CatWorld.Resources.Localization {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Püütud mänguasjad.
+        ///   Ищет локализованную строку, похожую на Toys caught.
         /// </summary>
         internal static string ToysCaught {
             get {

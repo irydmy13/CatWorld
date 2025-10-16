@@ -1,14 +1,15 @@
-<?xml version="1.0" encoding="UTF-8" ?>
+<?xml version="1.0" encoding="utf-8" ?>
 <Shell
-    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
-    xmlns:res="clr-namespace:CatWorld.Resources.Localization"
-    Title="{x:Static res:AppResources.Title}"
-
     x:Class="CatWorld.AppShell"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:views="clr-namespace:CatWorld.Views"
+    xmlns:res="clr-namespace:CatWorld.Resources.Localization"
     Shell.FlyoutBehavior="Disabled">
+
     <TabBar>
-        <ShellContent Title="{x:Static resources:AppResources.Title}" ContentTemplate="{DataTemplate views:GamePage}" />
-        <ShellContent Title="{x:Static resources:AppResources.Settings}" ContentTemplate="{DataTemplate views:SettingsPage}" />
-        <ShellContent Title="{x:Static resources:AppResources.Stats}" ContentTemplate="{DataTemplate views:StatsPage}" />
+        <ShellContent Title="{x:Static res:AppResources.Title}" ContentTemplate="{DataTemplate views:GamePage}" />
+        <ShellContent Title="{x:Static res:AppResources.Settings}" ContentTemplate="{DataTemplate views:SettingsPage}" />
+        <ShellContent Title="{x:Static res:AppResources.Stats}" ContentTemplate="{DataTemplate views:StatsPage}" />
     </TabBar>
 </Shell>
