@@ -2,21 +2,39 @@
 <ContentPage x:Class="CatWorld.Views.GamePage"
              xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             xmlns:vm="clr-namespace:CatWorld.ViewModels"
              xmlns:res="clr-namespace:CatWorld.Resources.Localization"
              Title="{x:Static res:AppResources.Title}">
 
-
     <Grid RowDefinitions="*,Auto">
-        <!-- Игровая зона -->
-        <Grid Grid.Row="0">
-            <Image
-      Aspect="AspectFill"
-      InputTransparent="True"
-      Source="{AppThemeBinding Light=bg_day.png, Dark=bg_night.png}" />
 
-           <!-- Drop-зона -->
+        <!-- Фоны -->
+        <Grid Grid.Row="0">
+            <!-- Комната (день/ночь) -->
+            <Image Aspect="AspectFill"
+             InputTransparent="True"
+             Source="{AppThemeBinding Light=bg_day.png, Dark=bg_night.png}">
+                <Image.Triggers>
+                    <DataTrigger TargetType="Image" Binding="{Binding IsOutside}" Value="True">
+                        <Setter Property="IsVisible" Value="False"/>
+                    </DataTrigger>
+                </Image.Triggers>
+            </Image>
+
+            <!-- Улица -->
+            <Image Aspect="AspectFill"
+             InputTransparent="True"
+             Source="bg_street.png"
+             IsVisible="False">
+                <Image.Triggers>
+                    <DataTrigger TargetType="Image" Binding="{Binding IsOutside}" Value="True">
+                        <Setter Property="IsVisible" Value="True"/>
+                    </DataTrigger>
+                </Image.Triggers>
+            </Image>
+
+            <!-- ===== Игровая зона поверх фонов ===== -->
             <AbsoluteLayout x:Name="PlayArea">
+
                 <!-- Кот -->
                 <Image x:Name="Cat"
                Source="cat.png"
@@ -24,43 +42,64 @@
                TranslationX="{Binding CatX}"
                TranslationY="{Binding CatY}">
                     <Image.GestureRecognizers>
-                        <!-- тап по области заставляет кота идти в точку -->
-                        <TapGestureRecognizer NumberOfTapsRequired="1"
-                                  Tapped="OnPlayAreaTapped"/>
+                        <TapGestureRecognizer NumberOfTapsRequired="1" Tapped="OnPlayAreaTapped"/>
                     </Image.GestureRecognizers>
                 </Image>
 
-                <!-- Drop-обработчик на область -->
+                <!-- Drop + Tap на всю площадь -->
                 <AbsoluteLayout.GestureRecognizers>
                     <DropGestureRecognizer Drop="OnDropToy" />
                     <TapGestureRecognizer NumberOfTapsRequired="1" Tapped="OnPlayAreaTapped"/>
                 </AbsoluteLayout.GestureRecognizers>
+
             </AbsoluteLayout>
         </Grid>
 
-        <!-- Панель игрушек -->
-        <CollectionView Grid.Row="1"
-                    ItemsSource="{Binding Toys}"
-                    ItemsLayout="HorizontalList"
-                    HeightRequest="110"
-                    Margin="10">
-            <CollectionView.ItemTemplate>
-                <DataTemplate>
-                    <Grid Padding="6">
-                        <Frame Padding="8" HasShadow="True" CornerRadius="12">
-                            <StackLayout>
-                                <Image Source="{Binding Icon}" WidthRequest="64" HeightRequest="64">
-                                    <Image.GestureRecognizers>
-                                        <DragGestureRecognizer CanDrag="True"
-                                           DragStarting="OnToyDragStarting"/>
-                                    </Image.GestureRecognizers>
-                                </Image>
-                                <Label Text="{Binding Name}" HorizontalOptions="Center" />
-                            </StackLayout>
-                        </Frame>
-                    </Grid>
-                </DataTemplate>
-            </CollectionView.ItemTemplate>
-        </CollectionView>
+        <!-- ===== Панель игрушек ===== -->
+        <!-- ===== Панель: дверь + игрушки ===== -->
+        <Grid Grid.Row="1"
+      ColumnDefinitions="Auto,*"
+      HeightRequest="110"
+      Padding="10,6">
+
+            <!-- Кнопка-дверь -->
+            <VerticalStackLayout Spacing="4" VerticalOptions="Center">
+                <ImageButton Source="door.png"
+                 WidthRequest="56" HeightRequest="56"
+                 BackgroundColor="Transparent"
+                 Command="{Binding ToggleLocationCommand}"
+                 SemanticProperties.Hint="Toggle location"/>
+                <!-- подпись под иконкой (по желанию — можно удалить) -->
+                <Label Text="Door"
+           FontSize="12"
+           HorizontalTextAlignment="Center"
+           Opacity="0.8"/>
+            </VerticalStackLayout>
+
+            <!-- Список игрушек -->
+            <CollectionView Grid.Column="1"
+                  ItemsSource="{Binding Toys}"
+                  ItemsLayout="HorizontalList"
+                  Margin="12,0,0,0">
+                <CollectionView.ItemTemplate>
+                    <DataTemplate>
+                        <Grid Padding="6">
+                            <Frame Padding="8" HasShadow="True" CornerRadius="12">
+                                <StackLayout>
+                                    <Image Source="{Binding Icon}" WidthRequest="64" HeightRequest="64">
+                                        <Image.GestureRecognizers>
+                                            <DragGestureRecognizer CanDrag="True"
+                                         DragStarting="OnToyDragStarting"/>
+                                        </Image.GestureRecognizers>
+                                    </Image>
+                                    <Label Text="{Binding Name}" HorizontalOptions="Center" />
+                                </StackLayout>
+                            </Frame>
+                        </Grid>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+        </Grid>
+
     </Grid>
 </ContentPage>

@@ -16,19 +16,39 @@ public class GameViewModel : INotifyPropertyChanged
     private readonly IAudioService _audio;
     private readonly ISettingsService _settings;
 
-    private Stopwatch _session = new();
+    private readonly Stopwatch _session = new();
 
     public ObservableCollection<Toy> Toys { get; } = new();
 
-    // Позиция кота (привязана к XAML)
-    double _catX; public double CatX { get => _catX; set { _catX = value; OnPropertyChanged(nameof(CatX)); } }
-    double _catY; public double CatY { get => _catY; set { _catY = value; OnPropertyChanged(nameof(CatY)); } }
+    // Позиция кота (биндится в XAML)
+    double _catX;
+    public double CatX { get => _catX; set { if (_catX != value) { _catX = value; OnPropertyChanged(nameof(CatX)); } } }
 
-    int _score; public int Score { get => _score; set { _score = value; OnPropertyChanged(nameof(Score)); } }
-    int _toysCaught; public int ToysCaught { get => _toysCaught; set { _toysCaught = value; OnPropertyChanged(nameof(ToysCaught)); } }
+    double _catY;
+    public double CatY { get => _catY; set { if (_catY != value) { _catY = value; OnPropertyChanged(nameof(CatY)); } } }
 
+    int _score;
+    public int Score { get => _score; set { if (_score != value) { _score = value; OnPropertyChanged(nameof(Score)); } } }
+
+    int _toysCaught;
+    public int ToysCaught { get => _toysCaught; set { if (_toysCaught != value) { _toysCaught = value; OnPropertyChanged(nameof(ToysCaught)); } } }
+
+    // --- Локация: Комната / Улица ---
+    bool _isOutside;
+    public bool IsOutside
+    {
+        get => _isOutside;
+        set { if (_isOutside != value) { _isOutside = value; OnPropertyChanged(nameof(IsOutside)); } }
+    }
+
+    // Запоминаем последнюю позицию кота для каждой локации
+    double _roomX, _roomY;
+    double _outX, _outY;
+
+    // Команды
     public ICommand TapMoveCommand { get; }
-    public ICommand DropToyCommand { get; } // parameter: Toy
+    public ICommand DropToyCommand { get; }
+    public ICommand ToggleLocationCommand { get; }
 
     public GameViewModel(IDatabaseService db, IAudioService audio, ISettingsService settings)
     {
@@ -37,6 +57,7 @@ public class GameViewModel : INotifyPropertyChanged
 
         TapMoveCommand = new Command<Point>(async p => await MoveCatAsync(p));
         DropToyCommand = new Command<Toy>(async toy => await CatchToyAsync(toy));
+        ToggleLocationCommand = new Command(async () => await ToggleLocationAsync());
     }
 
     public async Task InitAsync()
@@ -45,23 +66,11 @@ public class GameViewModel : INotifyPropertyChanged
         var toys = await _db.GetToysAsync();
         Toys.Clear();
         foreach (var t in toys) Toys.Add(t);
+
+        // стартуем с комнаты, кот примерно в центре (значения уточняются после первой анимации)
+        IsOutside = false;
+        _roomX = CatX; _roomY = CatY;
         _session.Restart();
-    }
-
-    async Task MoveCatAsync(Point p)
-    {
-        // позиция обновляется анимацией в code-behind; тут можно звук «мяу»
-        await _audio.PlayAsync("meow.mp3");
-    }
-
-    async Task CatchToyAsync(Toy toy)
-    {
-        // повысим счёт и радость
-        ToysCaught++;
-        Score += toy.Fun;
-        await _audio.PlayAsync("purr.mp3");
-        OnPropertyChanged(nameof(Score));
-        OnPropertyChanged(nameof(ToysCaught));
     }
 
     public async Task SaveStatsAsync()
@@ -73,5 +82,37 @@ public class GameViewModel : INotifyPropertyChanged
         stat.TotalPlaySeconds += (long)_session.Elapsed.TotalSeconds;
         stat.UpdatedAt = DateTime.UtcNow;
         await _db.SaveStatAsync(stat);
+    }
+
+    async Task MoveCatAsync(Point p)
+    {
+        // звук шага/мяу — по желанию
+        await _audio.PlayAsync("meow.mp3");
+    }
+
+    async Task CatchToyAsync(Toy toy)
+    {
+        ToysCaught++;
+        Score += toy.Fun;
+        await _audio.PlayAsync("purr.mp3");
+    }
+
+    async Task ToggleLocationAsync()
+    {
+        // запомним позицию текущей локации
+        if (IsOutside) { _outX = CatX; _outY = CatY; }
+        else { _roomX = CatX; _roomY = CatY; }
+
+        IsOutside = !IsOutside;
+
+        // вернём кота туда, где он был в новой локации (если ещё не был — оставим как есть)
+        var targetX = IsOutside ? (_outX != 0 ? _outX : CatX) : (_roomX != 0 ? _roomX : CatX);
+        var targetY = IsOutside ? (_outY != 0 ? _outY : CatY) : (_roomY != 0 ? _roomY : CatY);
+
+        CatX = targetX; OnPropertyChanged(nameof(CatX));
+        CatY = targetY; OnPropertyChanged(nameof(CatY));
+
+        // (опционально) звук двери — добавь door.wav в Resources/Raw/
+        // await _audio.PlayAsync("door.wav");
     }
 }
