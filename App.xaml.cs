@@ -1,15 +1,14 @@
-﻿namespace CatWorld
-{
-    public partial class App : Application
-    {
-        public App()
-        {
-            InitializeComponent();
-        }
+﻿using CatWorld.Services;
+using CatWorld.Views;
+using Microsoft.Maui.Controls;
+namespace CatWorld;
 
-        protected override Window CreateWindow(IActivationState? activationState)
-        {
-            return new Window(new AppShell());
-        }
+public partial class App : Application
+{
+    public App(IThemeService themeService)
+    {
+        InitializeComponent();
+        themeService.Apply(ThemeService.LoadSavedOrDefault());
+        MainPage = new AppShell();
     }
 }

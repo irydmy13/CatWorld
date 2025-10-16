@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <Shell
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:res="clr-namespace:CatWorld.Resources.Localization"
+    Title="{x:Static res:AppResources.Title}"
+
     x:Class="CatWorld.AppShell"
     Shell.FlyoutBehavior="Disabled">
     <TabBar>

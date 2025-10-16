@@ -4,6 +4,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:vm="clr-namespace:CatWorld.ViewModels"
              xmlns:res="clr-namespace:CatWorld.Resources.Localization"
+             Title="{x:Static res:AppResources.Title}">
 
     <ContentPage.BindingContext>
         <vm:GameViewModel />

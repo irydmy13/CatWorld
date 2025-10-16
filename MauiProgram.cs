@@ -2,6 +2,7 @@
 using CatWorld.ViewModels;
 using CatWorld.Views;
 using Plugin.Maui.Audio;
+using CommunityToolkit.Maui;
 
 namespace CatWorld;
 
