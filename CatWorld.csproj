@@ -92,6 +92,7 @@
 		<EmbeddedResource Update="Resources/Localization/AppResources.resx">
 			<Generator>PublicResXFileCodeGenerator</Generator>
 			<CustomToolNamespace>CatWorld.Resources.Localization</CustomToolNamespace>
+			<LastGenOutput>AppResources.Designer.cs</LastGenOutput>
 		</EmbeddedResource>
 		<EmbeddedResource Update="Resources/Localization/AppResources.et.resx" />
 		<EmbeddedResource Update="Resources\Localization\AppResources.ru.resx">
@@ -100,6 +101,9 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <MauiXaml Update="Views\CatchGamePage.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
 	  <MauiXaml Update="Views\GamePage.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
@@ -109,6 +113,30 @@
 	  <MauiXaml Update="Views\StatsPage.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
+	</ItemGroup>
+
+	<ItemGroup>
+	  <MauiImage Include="Resources\Images\items\apple.png" />
+	  <MauiImage Include="Resources\Images\items\banan.png" />
+	  <MauiImage Include="Resources\Images\items\book.png" />
+	  <MauiImage Include="Resources\Images\items\burger.png" />
+	  <MauiImage Include="Resources\Images\items\cake.png" />
+	  <MauiImage Include="Resources\Images\items\candy.png" />
+	  <MauiImage Include="Resources\Images\items\clock.png" />
+	  <MauiImage Include="Resources\Images\items\doll.png" />
+	  <MauiImage Include="Resources\Images\items\folk.png" />
+	  <MauiImage Include="Resources\Images\items\gamepad.png" />
+	  <MauiImage Include="Resources\Images\items\phone.png" />
+	  <MauiImage Include="Resources\Images\items\pizza.png" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <MauiAsset Update="Resources\Raw\oops.mp3">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </MauiAsset>
+	  <MauiAsset Update="Resources\Raw\yummy.mp3">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </MauiAsset>
 	</ItemGroup>
 
 </Project>

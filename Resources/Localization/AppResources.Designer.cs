@@ -70,6 +70,15 @@ namespace CatWorld.Resources.Localization {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Door.
+        /// </summary>
+        public static string Door {
+            get {
+                return ResourceManager.GetString("Door", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Language.
         /// </summary>
         public static string Language {
@@ -84,6 +93,15 @@ namespace CatWorld.Resources.Localization {
         public static string Light {
             get {
                 return ResourceManager.GetString("Light", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на MiniGame.
+        /// </summary>
+        public static string MiniGame {
+            get {
+                return ResourceManager.GetString("MiniGame", resourceCulture);
             }
         }
         

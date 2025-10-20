@@ -20,7 +20,7 @@ public class GameViewModel : INotifyPropertyChanged
 
     public ObservableCollection<Toy> Toys { get; } = new();
 
-    // Позиция кота (биндится в XAML)
+    // -------- Позиция кота --------
     double _catX;
     public double CatX { get => _catX; set { if (_catX != value) { _catX = value; OnPropertyChanged(nameof(CatX)); } } }
 
@@ -33,7 +33,7 @@ public class GameViewModel : INotifyPropertyChanged
     int _toysCaught;
     public int ToysCaught { get => _toysCaught; set { if (_toysCaught != value) { _toysCaught = value; OnPropertyChanged(nameof(ToysCaught)); } } }
 
-    // --- Локация: Комната / Улица ---
+    // -------- Локация: Комната / Улица --------
     bool _isOutside;
     public bool IsOutside
     {
@@ -41,14 +41,29 @@ public class GameViewModel : INotifyPropertyChanged
         set { if (_isOutside != value) { _isOutside = value; OnPropertyChanged(nameof(IsOutside)); } }
     }
 
-    // Запоминаем последнюю позицию кота для каждой локации
+    // Последняя позиция кота в каждой локации
     double _roomX, _roomY;
     double _outX, _outY;
 
-    // Команды
+    // -------- Мини-игра (на улице) --------
+    bool _isMiniGame;
+    public bool IsMiniGame
+    {
+        get => _isMiniGame;
+        set { if (_isMiniGame != value) { _isMiniGame = value; OnPropertyChanged(nameof(IsMiniGame)); } }
+    }
+
+    int _miniScore;
+    public int MiniScore { get => _miniScore; set { if (_miniScore != value) { _miniScore = value; OnPropertyChanged(nameof(MiniScore)); } } }
+
+    int _miniLives = 3;
+    public int MiniLives { get => _miniLives; set { if (_miniLives != value) { _miniLives = value; OnPropertyChanged(nameof(MiniLives)); } } }
+
+    // -------- Команды --------
     public ICommand TapMoveCommand { get; }
     public ICommand DropToyCommand { get; }
     public ICommand ToggleLocationCommand { get; }
+    public ICommand ToggleMiniGameCommand { get; }
 
     public GameViewModel(IDatabaseService db, IAudioService audio, ISettingsService settings)
     {
@@ -58,6 +73,14 @@ public class GameViewModel : INotifyPropertyChanged
         TapMoveCommand = new Command<Point>(async p => await MoveCatAsync(p));
         DropToyCommand = new Command<Toy>(async toy => await CatchToyAsync(toy));
         ToggleLocationCommand = new Command(async () => await ToggleLocationAsync());
+
+        // запуск / стоп мини-игры (только на улице)
+        ToggleMiniGameCommand = new Command(() =>
+        {
+            if (!IsOutside) return;        // играть можно только на улице
+            IsMiniGame = !IsMiniGame;
+            if (IsMiniGame) { MiniScore = 0; MiniLives = 3; }
+        });
     }
 
     public async Task InitAsync()
@@ -67,15 +90,23 @@ public class GameViewModel : INotifyPropertyChanged
         Toys.Clear();
         foreach (var t in toys) Toys.Add(t);
 
-        // стартуем с комнаты, кот примерно в центре (значения уточняются после первой анимации)
+        // стартуем с комнаты
         IsOutside = false;
         _roomX = CatX; _roomY = CatY;
+
+        // на всякий случай выключим любые фоновые звуки
+        _audio.StopLoop();
+
         _session.Restart();
     }
 
     public async Task SaveStatsAsync()
     {
         _session.Stop();
+
+        // при уходе со страницы глушим фон
+        _audio.StopLoop();
+
         var stat = await _db.GetStatAsync();
         stat.Score += Score;
         stat.ToysCaught += ToysCaught;
@@ -86,7 +117,7 @@ public class GameViewModel : INotifyPropertyChanged
 
     async Task MoveCatAsync(Point p)
     {
-        // звук шага/мяу — по желанию
+        // короткий эффект (по желанию)
         await _audio.PlayAsync("meow.mp3");
     }
 
@@ -103,16 +134,24 @@ public class GameViewModel : INotifyPropertyChanged
         if (IsOutside) { _outX = CatX; _outY = CatY; }
         else { _roomX = CatX; _roomY = CatY; }
 
+        // переключаемся
         IsOutside = !IsOutside;
 
-        // вернём кота туда, где он был в новой локации (если ещё не был — оставим как есть)
+        // восстановим позицию в новой локации
         var targetX = IsOutside ? (_outX != 0 ? _outX : CatX) : (_roomX != 0 ? _roomX : CatX);
         var targetY = IsOutside ? (_outY != 0 ? _outY : CatY) : (_roomY != 0 ? _roomY : CatY);
 
         CatX = targetX; OnPropertyChanged(nameof(CatX));
         CatY = targetY; OnPropertyChanged(nameof(CatY));
 
-        // (опционально) звук двери — добавь door.wav в Resources/Raw/
-        // await _audio.PlayAsync("door.wav");
+        // звук: птицы на улице, тишина в комнате
+        if (IsOutside)
+            await _audio.PlayLoopAsync("birdsongs.mp3", 0.35);
+        else
+            _audio.StopLoop();
+
+        // если вернулись домой — выключаем мини-игру
+        if (!IsOutside && IsMiniGame)
+            IsMiniGame = false;
     }
 }

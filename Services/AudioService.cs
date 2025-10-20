@@ -4,31 +4,60 @@ namespace CatWorld.Services;
 
 public interface IAudioService
 {
-    Task PlayAsync(string fileName);
-    Task StopAsync();
     bool IsEnabled { get; set; }
+
+    // одноразовый короткий звук
+    Task PlayAsync(string file, double volume = 1.0);
+
+    // фоновая дорожка по кругу
+    Task PlayLoopAsync(string file, double volume = 0.5);
+
+    // остановить фон
+    void StopLoop();
 }
 
 public class AudioService : IAudioService
 {
     private readonly IAudioManager _audio;
-    private IAudioPlayer? _player;
-    public bool IsEnabled { get; set; } = true;
+    private IAudioPlayer? _loopPlayer;
 
     public AudioService(IAudioManager audio) => _audio = audio;
 
-    public async Task PlayAsync(string fileName)
+    public bool IsEnabled { get; set; } = true;
+
+    public async Task PlayAsync(string file, double volume = 1.0)
     {
         if (!IsEnabled) return;
-        _player?.Stop();
-        using var stream = await FileSystem.OpenAppPackageFileAsync(fileName);
-        _player = _audio.CreatePlayer(stream);
-        _player.Play();
+
+        using var stream = await FileSystem.OpenAppPackageFileAsync(file);
+        using var player = _audio.CreatePlayer(stream);
+        player.Volume = Math.Clamp(volume, 0, 1);
+        player.Play();
+        // дождёмся завершения (очень короткие клипы)
+        await Task.Delay(TimeSpan.FromMilliseconds(Math.Max(50, player.Duration * 1000)));
     }
 
-    public Task StopAsync()
+    public async Task PlayLoopAsync(string file, double volume = 0.5)
     {
-        _player?.Stop();
-        return Task.CompletedTask;
+        StopLoop();                    // глушим предыдущий луп если был
+        if (!IsEnabled) return;
+
+        var stream = await FileSystem.OpenAppPackageFileAsync(file);
+        _loopPlayer = _audio.CreatePlayer(stream);
+        _loopPlayer.Loop = true;
+        _loopPlayer.Volume = Math.Clamp(volume, 0, 1);
+        _loopPlayer.Play();
+    }
+
+    public void StopLoop()
+    {
+        try
+        {
+            if (_loopPlayer is null) return;
+            _loopPlayer.Stop();
+            _loopPlayer.Dispose();
+            _loopPlayer = null;
+        }
+        catch { /* ignore */ }
     }
 }

@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage x:Class="CatWorld.Views.CatchGamePage"
+             xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:res="clr-namespace:CatWorld.Resources.Localization"
+             Title="{x:Static Member=res:AppResources.MiniGame}">
+    <Grid RowDefinitions="Auto,*,Auto">
+
+        <!-- HUD -->
+        <Grid Grid.Row="0" ColumnDefinitions="*,Auto,Auto" Padding="12,8">
+            <Label Text="{x:Static res:AppResources.Score}" FontAttributes="Bold"/>
+            <Label Grid.Column="1" Text="{Binding Score}" Margin="8,0" />
+            <Label Grid.Column="2" Text="{Binding Best, StringFormat='Best {0}'}" />
+        </Grid>
+
+        <!-- Поле игры -->
+        <AbsoluteLayout x:Name="PlayField" Grid.Row="1" BackgroundColor="Transparent">
+            <!-- фон комнаты/улицы не нужен; поставим нейтральный -->
+            <Image Source="{AppThemeBinding Light=bg_day.png, Dark=bg_night.png}" Aspect="AspectFill" InputTransparent="True"/>
+
+            <!-- кот (движется по X) -->
+            <Image x:Name="Cat" Source="cat.png" WidthRequest="120" HeightRequest="120"
+        AbsoluteLayout.LayoutBounds=".5,1,120,120"
+        AbsoluteLayout.LayoutFlags="PositionProportional">
+                <Image.GestureRecognizers>
+                    <!-- перетаскивание по горизонтали -->
+                    <PanGestureRecognizer PanUpdated="OnPanCat" />
+                    <!-- тап для прыжка в точку -->
+                    <TapGestureRecognizer Tapped="OnTapField"/>
+                </Image.GestureRecognizers>
+            </Image>
+        </AbsoluteLayout>
+
+        <!-- Кнопки -->
+        <Grid Grid.Row="2" ColumnDefinitions="*,Auto,Auto,Auto,*" Padding="10" ColumnSpacing="10">
+            <Button Grid.Column="1" Text="{x:Static res:AppResources.Play}"  Command="{Binding StartCommand}" />
+            <Button Grid.Column="2" Text="Pause"  Command="{Binding PauseCommand}" />
+            <Button Grid.Column="3" Text="Reset"  Command="{Binding ResetCommand}" />
+        </Grid>
+
+    </Grid>
+</ContentPage>

@@ -7,7 +7,7 @@
 
     <Grid RowDefinitions="*,Auto">
 
-        <!-- Фоны -->
+        <!-- ===== Фоны ===== -->
         <Grid Grid.Row="0">
             <!-- Комната (день/ночь) -->
             <Image Aspect="AspectFill"
@@ -20,20 +20,37 @@
                 </Image.Triggers>
             </Image>
 
-            <!-- Улица -->
-            <Image Aspect="AspectFill"
-             InputTransparent="True"
-             Source="bg_street.png"
-             IsVisible="False">
-                <Image.Triggers>
-                    <DataTrigger TargetType="Image" Binding="{Binding IsOutside}" Value="True">
-                        <Setter Property="IsVisible" Value="True"/>
+            <!-- Улица с фильтром -->
+            <Grid IsVisible="False">
+                <Grid.Triggers>
+                    <DataTrigger TargetType="Grid" Binding="{Binding IsOutside}" Value="True">
+                        <Setter Property="IsVisible" Value="True" />
                     </DataTrigger>
-                </Image.Triggers>
-            </Image>
+                </Grid.Triggers>
+
+                <Image Aspect="AspectFill"
+               InputTransparent="True"
+               Source="bg_street.png" />
+
+                <!-- тёплый оверлей + лёгкая виньетка -->
+                <BoxView InputTransparent="True"
+                 Opacity="0.18"
+                 BackgroundColor="{AppThemeBinding Light=#FFEFD8, Dark=#1A1A1A}" />
+                <Rectangle InputTransparent="True" Opacity="0.35">
+                    <Rectangle.Fill>
+                        <RadialGradientBrush Center="0.5,0.5" Radius="0.9">
+                            <GradientStop Offset="0.0" Color="{AppThemeBinding Light=#00FFC98B, Dark=#000000}" />
+                            <GradientStop Offset="1.0" Color="{AppThemeBinding Light=#88000000, Dark=#AA000000}" />
+                        </RadialGradientBrush>
+                    </Rectangle.Fill>
+                </Rectangle>
+            </Grid>
 
             <!-- ===== Игровая зона поверх фонов ===== -->
             <AbsoluteLayout x:Name="PlayArea">
+
+                <!-- Слой мини-игры (падающие предметы) -->
+                <AbsoluteLayout x:Name="FallLayer" IsVisible="False" />
 
                 <!-- Кот -->
                 <Image x:Name="Cat"
@@ -55,32 +72,43 @@
             </AbsoluteLayout>
         </Grid>
 
-        <!-- ===== Панель игрушек ===== -->
-        <!-- ===== Панель: дверь + игрушки ===== -->
+        <!-- ===== Нижняя панель: дверь + мини-игра + игрушки ===== -->
         <Grid Grid.Row="1"
-      ColumnDefinitions="Auto,*"
-      HeightRequest="110"
-      Padding="10,6">
+          ColumnDefinitions="Auto,Auto,*"
+          HeightRequest="110"
+          Padding="10,6"
+          ColumnSpacing="12">
 
-            <!-- Кнопка-дверь -->
+            <!-- Дверь -->
             <VerticalStackLayout Spacing="4" VerticalOptions="Center">
                 <ImageButton Source="door.png"
-                 WidthRequest="56" HeightRequest="56"
-                 BackgroundColor="Transparent"
-                 Command="{Binding ToggleLocationCommand}"
-                 SemanticProperties.Hint="Toggle location"/>
-                <!-- подпись под иконкой (по желанию — можно удалить) -->
-                <Label Text="Door"
-           FontSize="12"
-           HorizontalTextAlignment="Center"
-           Opacity="0.8"/>
+                     WidthRequest="56" HeightRequest="56"
+                     BackgroundColor="Transparent"
+                     Command="{Binding ToggleLocationCommand}"
+                     SemanticProperties.Hint="Toggle location"/>
+                <Label Text="{x:Static Member=res:AppResources.Door}"
+                       FontSize="12"
+                       HorizontalTextAlignment="Center"
+                       Opacity="0.8"/>  
             </VerticalStackLayout>
 
-            <!-- Список игрушек -->
-            <CollectionView Grid.Column="1"
-                  ItemsSource="{Binding Toys}"
-                  ItemsLayout="HorizontalList"
-                  Margin="12,0,0,0">
+            <!-- Мини-игра (только на улице) -->
+            <VerticalStackLayout Grid.Column="1" Spacing="4" VerticalOptions="Center">
+                <!-- одну кнопку Play/Stop переключаем по IsMiniGame -->
+                <Button x:Name="MiniBtn"
+                Text="Play"
+                Command="{Binding ToggleMiniGameCommand}"
+                IsEnabled="{Binding IsOutside}" />
+                <Label Text="{Binding MiniScore, StringFormat='Score: {0}'}"
+               FontSize="12"
+               HorizontalTextAlignment="Center"/>
+            </VerticalStackLayout>
+
+            <!-- Игрушки -->
+            <CollectionView Grid.Column="2"
+                      ItemsSource="{Binding Toys}"
+                      ItemsLayout="HorizontalList"
+                      Margin="0,0,0,0">
                 <CollectionView.ItemTemplate>
                     <DataTemplate>
                         <Grid Padding="6">
@@ -88,8 +116,7 @@
                                 <StackLayout>
                                     <Image Source="{Binding Icon}" WidthRequest="64" HeightRequest="64">
                                         <Image.GestureRecognizers>
-                                            <DragGestureRecognizer CanDrag="True"
-                                         DragStarting="OnToyDragStarting"/>
+                                            <DragGestureRecognizer CanDrag="True" DragStarting="OnToyDragStarting"/>
                                         </Image.GestureRecognizers>
                                     </Image>
                                     <Label Text="{Binding Name}" HorizontalOptions="Center" />
