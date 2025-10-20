@@ -55,7 +55,7 @@
                 <!-- Кот -->
                 <Image x:Name="Cat"
                Source="cat.png"
-               WidthRequest="300" HeightRequest="300"
+               WidthRequest="250" HeightRequest="250"
                TranslationX="{Binding CatX}"
                TranslationY="{Binding CatY}">
                     <Image.GestureRecognizers>
