@@ -37,6 +37,10 @@ public static class MauiProgram
         builder.Services.AddTransient<SettingsPage>();
         builder.Services.AddTransient<StatsPage>();
 
+        builder.Services.AddSingleton<ICoinsService, CoinsService>();
+        builder.Services.AddTransient<TicTacToeViewModel>();
+        builder.Services.AddTransient<TicTacToePage>();
+
         return builder.Build();
     }
 }

@@ -15,10 +15,17 @@ public class GameViewModel : INotifyPropertyChanged
     private readonly IDatabaseService _db;
     private readonly IAudioService _audio;
     private readonly ISettingsService _settings;
-
     private readonly Stopwatch _session = new();
 
     public ObservableCollection<Toy> Toys { get; } = new();
+
+    // Положение кота сразу после выхода на улицу (TranslationX / TranslationY)
+    public double OutsideStandX { get; set; } = 0;      // по центру
+    public double OutsideStandY { get; set; } = 250;    // ниже центра (подбери под свой фон/спрайт)
+
+    // Старт мини-игры на улице: X и фиксированная «дорожка» по Y
+    public double MiniStartX { get; set; } = 0;       // по центру
+    public double MiniTrackY { get; set; } = 300;     // высота дорожки (TranslationY)
 
     // -------- Позиция кота --------
     double _catX;
@@ -41,7 +48,7 @@ public class GameViewModel : INotifyPropertyChanged
         set { if (_isOutside != value) { _isOutside = value; OnPropertyChanged(nameof(IsOutside)); } }
     }
 
-    // Последняя позиция кота в каждой локации
+    // Последняя позиция кота в каждой локации (если нужна)
     double _roomX, _roomY;
     double _outX, _outY;
 
@@ -103,9 +110,7 @@ public class GameViewModel : INotifyPropertyChanged
     public async Task SaveStatsAsync()
     {
         _session.Stop();
-
-        // при уходе со страницы глушим фон
-        _audio.StopLoop();
+        _audio.StopLoop(); // глушим фон при уходе
 
         var stat = await _db.GetStatAsync();
         stat.Score += Score;
@@ -137,21 +142,26 @@ public class GameViewModel : INotifyPropertyChanged
         // переключаемся
         IsOutside = !IsOutside;
 
-        // восстановим позицию в новой локации
-        var targetX = IsOutside ? (_outX != 0 ? _outX : CatX) : (_roomX != 0 ? _roomX : CatX);
-        var targetY = IsOutside ? (_outY != 0 ? _outY : CatY) : (_roomY != 0 ? _roomY : CatY);
-
-        CatX = targetX; OnPropertyChanged(nameof(CatX));
-        CatY = targetY; OnPropertyChanged(nameof(CatY));
-
-        // звук: птицы на улице, тишина в комнате
         if (IsOutside)
+        {
+            // применяем ТВОИ координаты стояния на улице
+            CatX = OutsideStandX;
+            CatY = OutsideStandY;
+
             await _audio.PlayLoopAsync("birdsongs.mp3", 0.35);
+        }
         else
+        {
             _audio.StopLoop();
 
-        // если вернулись домой — выключаем мини-игру
-        if (!IsOutside && IsMiniGame)
-            IsMiniGame = false;
+            // вернём кота туда, где он был в комнате (или оставим как есть)
+            var targetX = _roomX != 0 ? _roomX : CatX;
+            var targetY = _roomY != 0 ? _roomY : CatY;
+            CatX = targetX; OnPropertyChanged(nameof(CatX));
+            CatY = targetY; OnPropertyChanged(nameof(CatY));
+
+            // выключаем мини-игру, если была
+            if (IsMiniGame) IsMiniGame = false;
+        }
     }
 }

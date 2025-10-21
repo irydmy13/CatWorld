@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage x:Class="CatWorld.Views.TicTacToePage"
+             xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             Title="Tic-Tac-Toe">
+
+    <Grid>
+        <!-- фон комнаты -->
+        <Image Source="room_toe.png" Aspect="AspectFill" />
+
+        <VerticalStackLayout Padding="16" Spacing="16">
+
+            <!-- панель выбора стикера + баланс -->
+            <Grid ColumnDefinitions="Auto,Auto,*" ColumnSpacing="12" VerticalOptions="Center">
+                <ImageButton Source="candy.png" WidthRequest="48" HeightRequest="48"
+                     BackgroundColor="Transparent"
+                     Command="{Binding SelectPlayerImageCommand}"
+                     CommandParameter="candy.png" />
+                <ImageButton Grid.Column="1" Source="toy_mouse.png" WidthRequest="48" HeightRequest="48"
+                     BackgroundColor="Transparent"
+                     Command="{Binding SelectPlayerImageCommand}"
+                     CommandParameter="toy_mouse.png" />
+
+                <!-- монетки справа -->
+                <HorizontalStackLayout Grid.Column="2" Spacing="6" HorizontalOptions="End" VerticalOptions="Center">
+                    <Image Source="coin.png" WidthRequest="22" HeightRequest="22"/>
+                    <Label Text="{Binding CoinsBalance}" FontAttributes="Bold"/>
+                </HorizontalStackLayout>
+            </Grid>
+
+            <Button Text="Новая игра" Command="{Binding NewGameCommand}" />
+
+            <Label Text="{Binding Status}" HorizontalTextAlignment="Center" />
+
+            <!-- Поле 3x3: белое, линии чёрные, внутри только Image-стикеры -->
+            <Grid RowDefinitions="*,*,*" ColumnDefinitions="*,*,*"
+            BackgroundColor="White"
+            HeightRequest="330" WidthRequest="330"
+            HorizontalOptions="Center" VerticalOptions="Center">
+
+                <!-- R0 -->
+                <Border Grid.Row="0" Grid.Column="0" Stroke="Black" StrokeThickness="2" BackgroundColor="White">
+                    <Image Source="{Binding Board[0].Image}" Aspect="Center" HeightRequest="72" WidthRequest="72">
+                        <Image.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="OnCell0"/>
+                        </Image.GestureRecognizers>
+                    </Image>
+                </Border>
+                <Border Grid.Row="0" Grid.Column="1" Stroke="Black" StrokeThickness="2" BackgroundColor="White">
+                    <Image Source="{Binding Board[1].Image}" Aspect="Center" HeightRequest="72" WidthRequest="72">
+                        <Image.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="OnCell1"/>
+                        </Image.GestureRecognizers>
+                    </Image>
+                </Border>
+                <Border Grid.Row="0" Grid.Column="2" Stroke="Black" StrokeThickness="2" BackgroundColor="White">
+                    <Image Source="{Binding Board[2].Image}" Aspect="Center" HeightRequest="72" WidthRequest="72">
+                        <Image.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="OnCell2"/>
+                        </Image.GestureRecognizers>
+                    </Image>
+                </Border>
+
+                <!-- R1 -->
+                <Border Grid.Row="1" Grid.Column="0" Stroke="Black" StrokeThickness="2" BackgroundColor="White">
+                    <Image Source="{Binding Board[3].Image}" Aspect="Center" HeightRequest="72" WidthRequest="72">
+                        <Image.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="OnCell3"/>
+                        </Image.GestureRecognizers>
+                    </Image>
+                </Border>
+                <Border Grid.Row="1" Grid.Column="1" Stroke="Black" StrokeThickness="2" BackgroundColor="White">
+                    <Image Source="{Binding Board[4].Image}" Aspect="Center" HeightRequest="72" WidthRequest="72">
+                        <Image.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="OnCell4"/>
+                        </Image.GestureRecognizers>
+                    </Image>
+                </Border>
+                <Border Grid.Row="1" Grid.Column="2" Stroke="Black" StrokeThickness="2" BackgroundColor="White">
+                    <Image Source="{Binding Board[5].Image}" Aspect="Center" HeightRequest="72" WidthRequest="72">
+                        <Image.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="OnCell5"/>
+                        </Image.GestureRecognizers>
+                    </Image>
+                </Border>
+
+                <!-- R2 -->
+                <Border Grid.Row="2" Grid.Column="0" Stroke="Black" StrokeThickness="2" BackgroundColor="White">
+                    <Image Source="{Binding Board[6].Image}" Aspect="Center" HeightRequest="72" WidthRequest="72">
+                        <Image.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="OnCell6"/>
+                        </Image.GestureRecognizers>
+                    </Image>
+                </Border>
+                <Border Grid.Row="2" Grid.Column="1" Stroke="Black" StrokeThickness="2" BackgroundColor="White">
+                    <Image Source="{Binding Board[7].Image}" Aspect="Center" HeightRequest="72" WidthRequest="72">
+                        <Image.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="OnCell7"/>
+                        </Image.GestureRecognizers>
+                    </Image>
+                </Border>
+                <Border Grid.Row="2" Grid.Column="2" Stroke="Black" StrokeThickness="2" BackgroundColor="White">
+                    <Image Source="{Binding Board[8].Image}" Aspect="Center" HeightRequest="72" WidthRequest="72">
+                        <Image.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="OnCell8"/>
+                        </Image.GestureRecognizers>
+                    </Image>
+                </Border>
+            </Grid>
+
+            <Label Text="Кот играет лапкой 🐾, ты — выбранной иконкой."
+             FontSize="12" Opacity="0.65" />
+        </VerticalStackLayout>
+    </Grid>
+</ContentPage>

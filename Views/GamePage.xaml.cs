@@ -1,6 +1,7 @@
 using CatWorld.Models;
 using CatWorld.ViewModels;
 using Microsoft.Maui.Layouts;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace CatWorld.Views;
 
@@ -8,7 +9,10 @@ public partial class GamePage : ContentPage
 {
     private GameViewModel VM => (GameViewModel)BindingContext;
 
-    // ===== Мини-игра «падения на улице» =====
+    // DI для навигации к TicTacToePage
+    private readonly IServiceProvider _sp;
+
+    // Мини-игра «падения на улице»
     IDispatcherTimer? _mgFrame;
     IDispatcherTimer? _mgSpawn;
     readonly Random _rnd = new();
@@ -26,16 +30,17 @@ public partial class GamePage : ContentPage
         "items/gamepad.png","items/folk.png","items/clock.png"
     };
 
-    // ===== мордочки кота =====
+    // мордочки кота 
     readonly string CAT_NORMAL = "cat.png";
     readonly string CAT_EAT = "cat_um.png";
     bool _eatFaceOn;
     CancellationTokenSource? _eatCts;
 
-    public GamePage(GameViewModel vm)
+    public GamePage(GameViewModel vm, IServiceProvider sp)
     {
         InitializeComponent();
         BindingContext = vm;
+        _sp = sp;
 
         VM.PropertyChanged += (_, e) =>
         {
@@ -57,6 +62,9 @@ public partial class GamePage : ContentPage
         base.OnAppearing();
         await VM.InitAsync();
 
+        await WaitForLayoutAsync();
+        EnsureMiniTimers();
+
         SizeChanged += (_, __) => { _w = PlayArea.Width; _h = PlayArea.Height; };
         MiniBtn.IsEnabled = VM.IsOutside;
         MiniBtn.Text = VM.IsMiniGame ? "Stop" : "Play";
@@ -70,19 +78,53 @@ public partial class GamePage : ContentPage
         base.OnDisappearing();
     }
 
-    // Тап по игровой области — кот идёт в точку
+    async Task WaitForLayoutAsync()
+    {
+        int guard = 0;
+        while ((PlayArea.Width <= 0 || PlayArea.Height <= 0) && guard++ < 50)
+            await Task.Delay(20);
+
+        _w = PlayArea.Width;
+        _h = PlayArea.Height;
+    }
+
+    // Тап: в комнате — свободно; на улице — только по X
     private async void OnPlayAreaTapped(object sender, TappedEventArgs e)
     {
         var p = e.GetPosition(PlayArea);
         if (p is null) return;
 
-        await Cat.TranslateTo(p.Value.X - Cat.Width / 2, p.Value.Y - Cat.Height / 2, 300, Easing.CubicOut);
+        if (VM.IsOutside)
+        {
+            double targetX = p.Value.X - Cat.Width / 2;
+            targetX = Math.Clamp(targetX, -_w / 2 + 60, _w / 2 - 60);
+            await Cat.TranslateTo(targetX, Cat.TranslationY, 220, Easing.CubicOut);
+        }
+        else
+        {
+            await Cat.TranslateTo(p.Value.X - Cat.Width / 2, p.Value.Y - Cat.Height / 2, 300, Easing.CubicOut);
+        }
 
         VM.CatX = Cat.TranslationX;
         VM.CatY = Cat.TranslationY;
 
         if (VM.TapMoveCommand?.CanExecute(p.Value) == true)
             VM.TapMoveCommand.Execute(p.Value);
+    }
+
+    // Горизонтальный pan только на улице
+    void OnPanOutside(object? sender, PanUpdatedEventArgs e)
+    {
+        if (!VM.IsOutside) return;
+        if (_w <= 0) return;
+
+        if (e.StatusType == GestureStatus.Running)
+        {
+            var x = Math.Clamp(Cat.TranslationX + e.TotalX,
+                               -_w / 2 + 60, _w / 2 - 60);
+            Cat.TranslationX = x;
+            VM.CatX = x;
+        }
     }
 
     private void OnToyDragStarting(object sender, DragStartingEventArgs e)
@@ -99,6 +141,14 @@ public partial class GamePage : ContentPage
             await Cat.TranslateTo(Cat.TranslationX, Cat.TranslationY, 100);
             VM.DropToyCommand?.Execute(toy);
         }
+    }
+
+    // ===== переход в Tic-Tac-Toe по кнопке-лапе =====
+    private async void OnOpenTicTacToe(object? sender, EventArgs e)
+    {
+        var page = _sp.GetRequiredService<TicTacToePage>();
+        await Shell.Current.Navigation.PushAsync(page);
+
     }
 
     // ===== мини-игра =====
@@ -122,6 +172,13 @@ public partial class GamePage : ContentPage
         EnsureMiniTimers();
         FallLayer.IsVisible = true;
         VM.MiniScore = 0; VM.MiniLives = 3;
+
+        // фиксируем кота на ТВОЕЙ «дорожке» и стартовом X
+        Cat.TranslationY = VM.MiniTrackY;
+        Cat.TranslationX = Math.Clamp(VM.MiniStartX, -_w / 2 + 60, _w / 2 - 60);
+        VM.CatX = Cat.TranslationX;
+        VM.CatY = Cat.TranslationY;
+
         _mgFrame!.Start();
         _mgSpawn!.Start();
         ResetCatFace();
@@ -169,18 +226,20 @@ public partial class GamePage : ContentPage
         if (_h <= 0) return;
 
         double dt = 0.016;
-        var catRect = GetRect(Cat, 90, 30);
+
+        // хитбоксы
+        var catRect = GetRectForCat(90, 30);
 
         for (int i = _items.Count - 1; i >= 0; i--)
         {
             var f = _items[i];
             f.Image.TranslationY += f.Speed * dt;
 
-            // --- если съедобное рядом — показать «едальную» мордочку на мгновение
+            // «едальная» мордочка при приближении съедобного
             if (f.IsEdible)
             {
-                double cx = _w / 2 + Cat.TranslationX;
-                double cy = _h / 2 + Cat.TranslationY;
+                double cx = Cat.TranslationX + Cat.Width / 2;
+                double cy = Cat.TranslationY + Cat.Height / 2;
                 double fx = _w / 2 + f.Image.TranslationX;
                 double fy = _h / 2 + f.Image.TranslationY;
                 double dx = cx - fx, dy = cy - fy;
@@ -188,7 +247,7 @@ public partial class GamePage : ContentPage
                 if (dist < 120 && !_eatFaceOn) _ = ShowEatFaceAsync(200);
             }
 
-            var r = GetRect(f.Image, 40, 40);
+            var r = GetRectForItem(f.Image, 40, 40);
             if (catRect.IntersectsWith(r))
             {
                 FallLayer.Remove(f.Image);
@@ -197,12 +256,12 @@ public partial class GamePage : ContentPage
                 if (f.IsEdible)
                 {
                     VM.MiniScore += 1;
-                    _ = ShowEatFaceAsync(500); // подольше при поимке еды
+                    _ = ShowEatFaceAsync(500);
                 }
                 else
                 {
                     VM.MiniLives -= 1;
-                    ResetCatFace();            // на несъедобное — обычная мордочка
+                    ResetCatFace();
                     _ = ShakeCat();
                     if (VM.MiniLives <= 0)
                     {
@@ -227,7 +286,15 @@ public partial class GamePage : ContentPage
             _mgSpawn.Interval = TimeSpan.FromMilliseconds(ms);
     }
 
-    Rect GetRect(View v, double w, double h)
+    // ===== прямоугольники с учётом разных систем координат =====
+    Rect GetRectForCat(double w, double h)
+    {
+        double cx = Cat.TranslationX + Cat.Width / 2;
+        double cy = Cat.TranslationY + Cat.Height / 2;
+        return new Rect(cx - w / 2, cy - h / 2, w, h);
+    }
+
+    Rect GetRectForItem(View v, double w, double h)
     {
         double cx = _w / 2 + v.TranslationX;
         double cy = _h / 2 + v.TranslationY;

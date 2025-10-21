@@ -7,12 +7,12 @@
 
     <Grid RowDefinitions="*,Auto">
 
-        <!-- ===== Фоны ===== -->
+        <!-- Фоны -->
         <Grid Grid.Row="0">
             <!-- Комната (день/ночь) -->
             <Image Aspect="AspectFill"
-             InputTransparent="True"
-             Source="{AppThemeBinding Light=bg_day.png, Dark=bg_night.png}">
+                   InputTransparent="True"
+                   Source="{AppThemeBinding Light=bg_day.png, Dark=bg_night.png}">
                 <Image.Triggers>
                     <DataTrigger TargetType="Image" Binding="{Binding IsOutside}" Value="True">
                         <Setter Property="IsVisible" Value="False"/>
@@ -29,13 +29,13 @@
                 </Grid.Triggers>
 
                 <Image Aspect="AspectFill"
-               InputTransparent="True"
-               Source="bg_street.png" />
+                       InputTransparent="True"
+                       Source="bg_street.png" />
 
                 <!-- тёплый оверлей + лёгкая виньетка -->
                 <BoxView InputTransparent="True"
-                 Opacity="0.18"
-                 BackgroundColor="{AppThemeBinding Light=#FFEFD8, Dark=#1A1A1A}" />
+                         Opacity="0.18"
+                         BackgroundColor="{AppThemeBinding Light=#FFEFD8, Dark=#1A1A1A}" />
                 <Rectangle InputTransparent="True" Opacity="0.35">
                     <Rectangle.Fill>
                         <RadialGradientBrush Center="0.5,0.5" Radius="0.9">
@@ -46,20 +46,25 @@
                 </Rectangle>
             </Grid>
 
-            <!-- ===== Игровая зона поверх фонов ===== -->
+            <!-- Игровая зона поверх фонов -->
             <AbsoluteLayout x:Name="PlayArea">
 
                 <!-- Слой мини-игры (падающие предметы) -->
-                <AbsoluteLayout x:Name="FallLayer" IsVisible="False" />
+                <AbsoluteLayout x:Name="FallLayer"
+                                IsVisible="False"
+                                AbsoluteLayout.LayoutBounds="0,0,1,1"
+                                AbsoluteLayout.LayoutFlags="All" />
 
                 <!-- Кот -->
                 <Image x:Name="Cat"
-               Source="cat.png"
-               WidthRequest="250" HeightRequest="250"
-               TranslationX="{Binding CatX}"
-               TranslationY="{Binding CatY}">
+                       Source="cat.png"
+                       WidthRequest="250" HeightRequest="250"
+                       TranslationX="{Binding CatX}"
+                       TranslationY="{Binding CatY}">
                     <Image.GestureRecognizers>
                         <TapGestureRecognizer NumberOfTapsRequired="1" Tapped="OnPlayAreaTapped"/>
+                        <!-- На улице — горизонтальный pan -->
+                        <PanGestureRecognizer PanUpdated="OnPanOutside"/>
                     </Image.GestureRecognizers>
                 </Image>
 
@@ -72,60 +77,51 @@
             </AbsoluteLayout>
         </Grid>
 
-        <!-- ===== Нижняя панель: дверь + мини-игра + игрушки ===== -->
+        <!-- Нижняя панель: дверь + лапа + мини-игра + игрушки -->
         <Grid Grid.Row="1"
-          ColumnDefinitions="Auto,Auto,*"
-          HeightRequest="110"
-          Padding="10,6"
-          ColumnSpacing="12">
+      ColumnDefinitions="Auto,Auto,Auto,*"
+      HeightRequest="110"
+      Padding="10,6"
+      ColumnSpacing="12">
 
             <!-- Дверь -->
             <VerticalStackLayout Spacing="4" VerticalOptions="Center">
                 <ImageButton Source="door.png"
-                     WidthRequest="56" HeightRequest="56"
-                     BackgroundColor="Transparent"
-                     Command="{Binding ToggleLocationCommand}"
-                     SemanticProperties.Hint="Toggle location"/>
+                 WidthRequest="56" HeightRequest="56"
+                 BackgroundColor="Transparent"
+                 Command="{Binding ToggleLocationCommand}"
+                 SemanticProperties.Hint="Toggle location"/>
                 <Label Text="{x:Static Member=res:AppResources.Door}"
-                       FontSize="12"
-                       HorizontalTextAlignment="Center"
-                       Opacity="0.8"/>  
+           FontSize="12"
+           HorizontalTextAlignment="Center"
+           Opacity="0.8"/>
             </VerticalStackLayout>
 
-            <!-- Мини-игра (только на улице) -->
+            <!-- Лапа -> TicTacToe -->
             <VerticalStackLayout Grid.Column="1" Spacing="4" VerticalOptions="Center">
-                <!-- одну кнопку Play/Stop переключаем по IsMiniGame -->
-                <Button x:Name="MiniBtn"
-                Text="Play"
-                Command="{Binding ToggleMiniGameCommand}"
-                IsEnabled="{Binding IsOutside}" />
-                <Label Text="{Binding MiniScore, StringFormat='Score: {0}'}"
-               FontSize="12"
-               HorizontalTextAlignment="Center"/>
+                <ImageButton Source="paw.png"
+                 WidthRequest="56" HeightRequest="56"
+                 BackgroundColor="Transparent"
+                 Clicked="OnOpenTicTacToe"
+                 SemanticProperties.Hint="Open Tic-Tac-Toe"/>
+                <Label Text="TicTacToe"
+           FontSize="12"
+           HorizontalTextAlignment="Center"
+           Opacity="0.8"/>
             </VerticalStackLayout>
 
-            <!-- Игрушки -->
-            <CollectionView Grid.Column="2"
-                      ItemsSource="{Binding Toys}"
-                      ItemsLayout="HorizontalList"
-                      Margin="0,0,0,0">
-                <CollectionView.ItemTemplate>
-                    <DataTemplate>
-                        <Grid Padding="6">
-                            <Frame Padding="8" HasShadow="True" CornerRadius="12">
-                                <StackLayout>
-                                    <Image Source="{Binding Icon}" WidthRequest="64" HeightRequest="64">
-                                        <Image.GestureRecognizers>
-                                            <DragGestureRecognizer CanDrag="True" DragStarting="OnToyDragStarting"/>
-                                        </Image.GestureRecognizers>
-                                    </Image>
-                                    <Label Text="{Binding Name}" HorizontalOptions="Center" />
-                                </StackLayout>
-                            </Frame>
-                        </Grid>
-                    </DataTemplate>
-                </CollectionView.ItemTemplate>
-            </CollectionView>
+            <!-- Мини-игра (Play/Stop) -->
+            <VerticalStackLayout Grid.Column="2" Spacing="2" VerticalOptions="Center">
+                <!-- ВАЖНО: x:Name="MiniBtn" -->
+                <Button x:Name="MiniBtn"
+            Text="Play"
+            Command="{Binding ToggleMiniGameCommand}"
+            IsEnabled="{Binding IsOutside}" />
+                <HorizontalStackLayout Spacing="10" HorizontalOptions="Center">
+                    <Label Text="{Binding MiniScore, StringFormat='Score: {0}'}" FontSize="12" />
+                    <Label Text="{Binding MiniTimeLeft, StringFormat='{0}s'}" FontSize="12" />
+                </HorizontalStackLayout>
+            </VerticalStackLayout>
         </Grid>
 
     </Grid>
