@@ -11,15 +11,19 @@ public partial class TicTacToePage : ContentPage
         InitializeComponent();
         BindingContext = vm;
     }
+    void Exec(int i)
+    {
+        if (VM?.TapCellCommand?.CanExecute(i) == true)
+            VM.TapCellCommand.Execute(i);
+    }
 
-    // Пробрасываем индексы в VM
-    void OnCell0(object s, TappedEventArgs e) => VM.TapCellCommand.Execute(0);
-    void OnCell1(object s, TappedEventArgs e) => VM.TapCellCommand.Execute(1);
-    void OnCell2(object s, TappedEventArgs e) => VM.TapCellCommand.Execute(2);
-    void OnCell3(object s, TappedEventArgs e) => VM.TapCellCommand.Execute(3);
-    void OnCell4(object s, TappedEventArgs e) => VM.TapCellCommand.Execute(4);
-    void OnCell5(object s, TappedEventArgs e) => VM.TapCellCommand.Execute(5);
-    void OnCell6(object s, TappedEventArgs e) => VM.TapCellCommand.Execute(6);
-    void OnCell7(object s, TappedEventArgs e) => VM.TapCellCommand.Execute(7);
-    void OnCell8(object s, TappedEventArgs e) => VM.TapCellCommand.Execute(8);
+    void OnCell0(object s, TappedEventArgs e) => Exec(0);
+    void OnCell1(object s, TappedEventArgs e) => Exec(1);
+    void OnCell2(object s, TappedEventArgs e) => Exec(2);
+    void OnCell3(object s, TappedEventArgs e) => Exec(3);
+    void OnCell4(object s, TappedEventArgs e) => Exec(4);
+    void OnCell5(object s, TappedEventArgs e) => Exec(5);
+    void OnCell6(object s, TappedEventArgs e) => Exec(6);
+    void OnCell7(object s, TappedEventArgs e) => Exec(7);
+    void OnCell8(object s, TappedEventArgs e) => Exec(8);
 }

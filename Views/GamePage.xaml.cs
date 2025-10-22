@@ -138,7 +138,7 @@ public partial class GamePage : ContentPage
         if (e.Data.Properties.TryGetValue("toy", out var obj) && obj is Toy toy)
         {
             await Cat.TranslateTo(Cat.TranslationX, Cat.TranslationY - 15, 100);
-            await Cat.TranslateTo(Cat.TranslationX, Cat.TranslationY, 100);
+            await Cat.TranslateTo(Cat.TranslationX, Cat.TranslationY, 100); // ← так правильно
             VM.DropToyCommand?.Execute(toy);
         }
     }

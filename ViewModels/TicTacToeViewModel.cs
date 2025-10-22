@@ -15,8 +15,8 @@ public class TicTacToeViewModel : INotifyPropertyChanged
     // ===== Модель клетки =====
     public class Cell : INotifyPropertyChanged
     {
-        string _owner = "";     // "", "P" (игрок), "B" (кот)
-        string _image = "";     // путь к картинке-стикеру
+        string _owner = "";
+        string _image = "";
         public string Owner { get => _owner; set { _owner = value; PropertyChanged?.Invoke(this, new(nameof(Owner))); } }
         public string Image { get => _image; set { _image = value; PropertyChanged?.Invoke(this, new(nameof(Image))); } }
         public bool IsEmpty => Owner == "";
@@ -26,41 +26,47 @@ public class TicTacToeViewModel : INotifyPropertyChanged
     readonly ICoinsService _coins;
 
     public ObservableCollection<Cell> Board { get; } =
-        new ObservableCollection<Cell>(Enumerable.Range(0, 9).Select(_ => new Cell()));
+        new(Enumerable.Range(0, 9).Select(_ => new Cell()));
 
-    // ===== Стикеры =====
-    public string BotImage { get; } = "paw.png";   // кот всегда лапкой
+    // Стикеры
+    public string BotImage { get; } = "paw.png"; // кот всегда лапкой
 
-    string _playerImage = "candy.png";             // по умолчанию — конфета
+    string _playerImage = "candy.png";           // дефолт
     public string PlayerImage
     {
         get => _playerImage;
         set { if (_playerImage != value) { _playerImage = value; OnPropertyChanged(); } }
     }
 
-    // нельзя менять стикер после первого хода игрока
-    bool _stickerLocked;
+    // Всплывающее окно выбора
+    bool _isPickerVisible;
+    public bool IsPickerVisible { get => _isPickerVisible; set { _isPickerVisible = value; OnPropertyChanged(); } }
 
-    // ===== Состояние =====
+    // Пока не выбрали стикер — играть нельзя
+    bool _awaitSticker;
+
+    // Состояние
     bool _isGameOver;
     public bool IsGameOver { get => _isGameOver; set { _isGameOver = value; OnPropertyChanged(); } }
 
-    bool _isPlayerTurn = true; // игрок начинает
+    bool _isPlayerTurn = true;
     public bool IsPlayerTurn { get => _isPlayerTurn; set { _isPlayerTurn = value; OnPropertyChanged(); } }
 
-    string _status = "Выбери стикер и нажми «Новая игра».";
+    string _status = "New game — choose a sticker";
     public string Status { get => _status; set { _status = value; OnPropertyChanged(); } }
 
     int _coinsBalance;
     public int CoinsBalance { get => _coinsBalance; set { _coinsBalance = value; OnPropertyChanged(); } }
 
-    // флаг, что сейчас ходит бот — чтобы не принять второй тап подряд
     bool _botThinking;
 
-    // ===== Команды =====
+    // Пауза «раздумья» кота
+    const int BotDelayMs = 2000;
+
+    // Команды
     public ICommand NewGameCommand { get; }
     public ICommand TapCellCommand { get; }
-    public ICommand SelectPlayerImageCommand { get; }
+    public ICommand PickStickerCommand { get; }   // выбор стикера и старт
 
     public TicTacToeViewModel(ICoinsService coins)
     {
@@ -69,46 +75,58 @@ public class TicTacToeViewModel : INotifyPropertyChanged
 
         NewGameCommand = new Command(NewGame);
         TapCellCommand = new Command<int>(TapCell);
-        SelectPlayerImageCommand = new Command<string>(src =>
-        {
-            // Разрешаем выбирать стикер пока доска пуста или партия завершена
-            if (!_stickerLocked || IsGameOver || Board.All(c => c.IsEmpty))
-                PlayerImage = src;
-        });
+        PickStickerCommand = new Command<string>(PickSticker);
     }
 
-    // ===== Игровая логика =====
+    // ===== Логика =====
     void NewGame()
     {
         foreach (var c in Board) { c.Owner = ""; c.Image = ""; }
         IsGameOver = false;
         IsPlayerTurn = true;
         _botThinking = false;
-        _stickerLocked = false;             // снова можно выбрать стикер до первого хода
-        Status = "Твой ход";
+
+        // Блокируем поле до выбора стикера
+        _awaitSticker = true;
+        IsPickerVisible = true;
+        Status = "Choose a sticker for the game";
+    }
+
+    void PickSticker(string? src)
+    {
+        if (!string.IsNullOrWhiteSpace(src))
+            PlayerImage = src;
+
+        // Разблокируем поле
+        _awaitSticker = false;
+        IsPickerVisible = false;
+        Status = "Your move";
     }
 
     void TapCell(int idx)
     {
+        if (_awaitSticker) return;          // ещё не выбрали стикер
         if (IsGameOver || !IsPlayerTurn || _botThinking) return;
         if (idx < 0 || idx > 8) return;
+
         var cell = Board[idx];
         if (!cell.IsEmpty) return;
 
         Place("P", idx, PlayerImage);
-        _stickerLocked = true;              // зафиксировали выбор стикера после 1-го хода
 
         if (FinishIfNeeded()) return;
 
         IsPlayerTurn = false;
-        BotMove();
+        _ = BotMoveAsync();
     }
 
-    void BotMove()
+    async Task BotMoveAsync()
     {
         _botThinking = true;
+        Status = "The cat is thinking…";
 
-        // идеальный ход кота (minimax)
+        await Task.Delay(BotDelayMs);
+
         var cur = Snapshot();
         int bestIdx = -1, bestScore = int.MinValue;
 
@@ -120,7 +138,6 @@ public class TicTacToeViewModel : INotifyPropertyChanged
             cur[i] = "";
             if (score > bestScore) { bestScore = score; bestIdx = i; }
         }
-
         if (bestIdx == -1) bestIdx = Enumerable.Range(0, 9).First(i => Board[i].IsEmpty);
 
         Place("B", bestIdx, BotImage);
@@ -130,13 +147,13 @@ public class TicTacToeViewModel : INotifyPropertyChanged
         if (FinishIfNeeded()) return;
 
         IsPlayerTurn = true;
-        Status = "Твой ход";
+        Status = "Your turn";
     }
 
     void Place(string who, int idx, string imageSrc)
     {
         Board[idx].Owner = who;
-        Board[idx].Image = imageSrc;  // именно картинка-стикер
+        Board[idx].Image = imageSrc;
     }
 
     bool FinishIfNeeded()
@@ -146,8 +163,7 @@ public class TicTacToeViewModel : INotifyPropertyChanged
         {
             IsGameOver = true;
             bool playerWon = (win == "P");
-            // статус без слова "монет(а)" — иконка уже в UI
-            Status = playerWon ? "Победа! +5" : "Кот выиграл! +1";
+            Status = playerWon ? "Victory! +5" : "The cat won! +1";
             _coins.Add(playerWon ? 5 : 1);
             CoinsBalance = _coins.Coins;
             return true;
@@ -155,7 +171,7 @@ public class TicTacToeViewModel : INotifyPropertyChanged
         if (Board.All(c => !c.IsEmpty))
         {
             IsGameOver = true;
-            Status = "Ничья +2";
+            Status = "Draw +2";
             _coins.Add(2);
             CoinsBalance = _coins.Coins;
             return true;

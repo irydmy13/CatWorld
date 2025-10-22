@@ -1,0 +1,20 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+
+	<!-- Тема для экрана запуска -->
+	<style name="Maui.SplashTheme" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+		<item name="android:windowBackground">@drawable/maui_splash</item>
+		<item name="android:forceDarkAllowed">false</item>
+		<item name="android:windowFullscreen">true</item>
+	</style>
+
+	<!-- Основная тема приложения -->
+	<style name="Maui.MainTheme" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+		<!-- оставить любые твои item'ы; главное — наследование от MaterialComponents -->
+		<item name="android:windowContentTransitions">true</item>
+		<item name="android:windowAllowEnterTransitionOverlap">true</item>
+		<item name="android:windowAllowReturnTransitionOverlap">true</item>
+		<item name="android:windowSharedElementsUseOverlay">true</item>
+	</style>
+
+</resources>
