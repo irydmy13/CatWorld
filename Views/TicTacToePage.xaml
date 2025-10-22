@@ -3,15 +3,13 @@
              xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              Title="Tic-Tac-Toe">
-
     <Grid>
-        <!-- фон комнаты -->
         <Image Source="room_toe.png" Aspect="AspectFill" />
 
         <VerticalStackLayout Padding="16" Spacing="16">
 
-            <!-- панель выбора стикера + баланс -->
-            <Grid ColumnDefinitions="Auto,Auto,*" ColumnSpacing="12" VerticalOptions="Center">
+            <!-- выбор стикера + монетки -->
+            <Grid ColumnDefinitions="Auto,Auto,*" ColumnSpacing="12">
                 <ImageButton Source="candy.png" WidthRequest="48" HeightRequest="48"
                      BackgroundColor="Transparent"
                      Command="{Binding SelectPlayerImageCommand}"
@@ -20,8 +18,6 @@
                      BackgroundColor="Transparent"
                      Command="{Binding SelectPlayerImageCommand}"
                      CommandParameter="toy_mouse.png" />
-
-                <!-- монетки справа -->
                 <HorizontalStackLayout Grid.Column="2" Spacing="6" HorizontalOptions="End" VerticalOptions="Center">
                     <Image Source="coin.png" WidthRequest="22" HeightRequest="22"/>
                     <Label Text="{Binding CoinsBalance}" FontAttributes="Bold"/>
@@ -29,16 +25,14 @@
             </Grid>
 
             <Button Text="Новая игра" Command="{Binding NewGameCommand}" />
-
             <Label Text="{Binding Status}" HorizontalTextAlignment="Center" />
 
-            <!-- Поле 3x3: белое, линии чёрные, внутри только Image-стикеры -->
+            <!-- поле 3x3 -->
             <Grid RowDefinitions="*,*,*" ColumnDefinitions="*,*,*"
-            BackgroundColor="White"
-            HeightRequest="330" WidthRequest="330"
+            BackgroundColor="White" HeightRequest="330" WidthRequest="330"
             HorizontalOptions="Center" VerticalOptions="Center">
 
-                <!-- R0 -->
+                <!-- ряд 0 -->
                 <Border Grid.Row="0" Grid.Column="0" Stroke="Black" StrokeThickness="2" BackgroundColor="White">
                     <Image Source="{Binding Board[0].Image}" Aspect="Center" HeightRequest="72" WidthRequest="72">
                         <Image.GestureRecognizers>
@@ -61,7 +55,7 @@
                     </Image>
                 </Border>
 
-                <!-- R1 -->
+                <!-- ряд 1 -->
                 <Border Grid.Row="1" Grid.Column="0" Stroke="Black" StrokeThickness="2" BackgroundColor="White">
                     <Image Source="{Binding Board[3].Image}" Aspect="Center" HeightRequest="72" WidthRequest="72">
                         <Image.GestureRecognizers>
@@ -84,7 +78,7 @@
                     </Image>
                 </Border>
 
-                <!-- R2 -->
+                <!-- ряд 2 -->
                 <Border Grid.Row="2" Grid.Column="0" Stroke="Black" StrokeThickness="2" BackgroundColor="White">
                     <Image Source="{Binding Board[6].Image}" Aspect="Center" HeightRequest="72" WidthRequest="72">
                         <Image.GestureRecognizers>

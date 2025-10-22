@@ -41,6 +41,8 @@ public static class MauiProgram
         builder.Services.AddTransient<TicTacToeViewModel>();
         builder.Services.AddTransient<TicTacToePage>();
 
+        builder.Services.AddTransient<GamePage>();
+
         return builder.Build();
     }
 }
