@@ -1,7 +1,6 @@
 using CatWorld.Models;
 using CatWorld.ViewModels;
 using Microsoft.Maui.Layouts;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace CatWorld.Views;
 
@@ -9,10 +8,7 @@ public partial class GamePage : ContentPage
 {
     private GameViewModel VM => (GameViewModel)BindingContext;
 
-    // DI для навигации к TicTacToePage
-    private readonly IServiceProvider _sp;
-
-    // Мини-игра «падения на улице»
+    // ===== Мини-игра «падения на улице» =====
     IDispatcherTimer? _mgFrame;
     IDispatcherTimer? _mgSpawn;
     readonly Random _rnd = new();
@@ -36,23 +32,23 @@ public partial class GamePage : ContentPage
     bool _eatFaceOn;
     CancellationTokenSource? _eatCts;
 
-    public GamePage(GameViewModel vm, IServiceProvider sp)
+    public GamePage(GameViewModel vm)
     {
         InitializeComponent();
         BindingContext = vm;
-        _sp = sp;
 
+        // Реагируем на переключение локации/мини-игры
         VM.PropertyChanged += (_, e) =>
         {
             if (e.PropertyName == nameof(VM.IsOutside))
             {
+                // Если ушли с улицы — гасим мини-игру
                 if (!VM.IsOutside) { VM.IsMiniGame = false; StopMini(); }
-                MiniBtn.IsEnabled = VM.IsOutside;
             }
             else if (e.PropertyName == nameof(VM.IsMiniGame))
             {
-                MiniBtn.Text = VM.IsMiniGame ? "Stop" : "Play";
-                if (VM.IsOutside && VM.IsMiniGame) StartMini(); else StopMini();
+                if (VM.IsOutside && VM.IsMiniGame) StartMini();
+                else StopMini();
             }
         };
     }
@@ -66,8 +62,6 @@ public partial class GamePage : ContentPage
         EnsureMiniTimers();
 
         SizeChanged += (_, __) => { _w = PlayArea.Width; _h = PlayArea.Height; };
-        MiniBtn.IsEnabled = VM.IsOutside;
-        MiniBtn.Text = VM.IsMiniGame ? "Stop" : "Play";
         ResetCatFace();
     }
 
@@ -127,28 +121,11 @@ public partial class GamePage : ContentPage
         }
     }
 
-    private void OnToyDragStarting(object sender, DragStartingEventArgs e)
+    // Переход в крестики-нолики (лапка)
+    async void OnOpenTicTacToe(object? sender, EventArgs e)
     {
-        if ((sender as Element)?.BindingContext is Toy toy)
-            e.Data.Properties["toy"] = toy;
-    }
-
-    private async void OnDropToy(object sender, DropEventArgs e)
-    {
-        if (e.Data.Properties.TryGetValue("toy", out var obj) && obj is Toy toy)
-        {
-            await Cat.TranslateTo(Cat.TranslationX, Cat.TranslationY - 15, 100);
-            await Cat.TranslateTo(Cat.TranslationX, Cat.TranslationY, 100); // ← так правильно
-            VM.DropToyCommand?.Execute(toy);
-        }
-    }
-
-    // ===== переход в Tic-Tac-Toe по кнопке-лапе =====
-    private async void OnOpenTicTacToe(object? sender, EventArgs e)
-    {
-        var page = _sp.GetRequiredService<TicTacToePage>();
-        await Shell.Current.Navigation.PushAsync(page);
-
+        await Navigation.PushAsync(new TicTacToePage(
+            Application.Current!.Services.GetService<TicTacToeViewModel>()!));
     }
 
     // ===== мини-игра =====
@@ -173,7 +150,7 @@ public partial class GamePage : ContentPage
         FallLayer.IsVisible = true;
         VM.MiniScore = 0; VM.MiniLives = 3;
 
-        // фиксируем кота на ТВОЕЙ «дорожке» и стартовом X
+        // фиксируем кота на дорожке и стартовых координатах
         Cat.TranslationY = VM.MiniTrackY;
         Cat.TranslationX = Math.Clamp(VM.MiniStartX, -_w / 2 + 60, _w / 2 - 60);
         VM.CatX = Cat.TranslationX;
@@ -227,7 +204,6 @@ public partial class GamePage : ContentPage
 
         double dt = 0.016;
 
-        // хитбоксы
         var catRect = GetRectForCat(90, 30);
 
         for (int i = _items.Count - 1; i >= 0; i--)
@@ -235,7 +211,6 @@ public partial class GamePage : ContentPage
             var f = _items[i];
             f.Image.TranslationY += f.Speed * dt;
 
-            // «едальная» мордочка при приближении съедобного
             if (f.IsEdible)
             {
                 double cx = Cat.TranslationX + Cat.Width / 2;
@@ -286,7 +261,6 @@ public partial class GamePage : ContentPage
             _mgSpawn.Interval = TimeSpan.FromMilliseconds(ms);
     }
 
-    // ===== прямоугольники с учётом разных систем координат =====
     Rect GetRectForCat(double w, double h)
     {
         double cx = Cat.TranslationX + Cat.Width / 2;
@@ -308,7 +282,6 @@ public partial class GamePage : ContentPage
         await Cat.TranslateTo(Cat.TranslationX - 10, Cat.TranslationY, 40);
     }
 
-    // ===== мордочки: утилиты =====
     void ResetCatFace()
     {
         try { _eatCts?.Cancel(); } catch { }
@@ -326,7 +299,7 @@ public partial class GamePage : ContentPage
         var cts = new CancellationTokenSource();
         _eatCts = cts;
         try { await Task.Delay(durationMs, cts.Token); }
-        catch (TaskCanceledException) { /* отмена */ }
+        catch (TaskCanceledException) { }
 
         if (!cts.IsCancellationRequested)
         {
@@ -335,7 +308,6 @@ public partial class GamePage : ContentPage
         }
     }
 
-    // ===== внутренняя модель падающего предмета =====
     class Faller
     {
         public Image Image { get; set; } = default!;

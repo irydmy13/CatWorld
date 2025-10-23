@@ -7,8 +7,9 @@
 
     <Grid RowDefinitions="*,Auto">
 
-        <!-- Фоны -->
+        <!-- ===== ФОНЫ ===== -->
         <Grid Grid.Row="0">
+
             <!-- Комната (день/ночь) -->
             <Image Aspect="AspectFill"
                    InputTransparent="True"
@@ -20,7 +21,7 @@
                 </Image.Triggers>
             </Image>
 
-            <!-- Улица с фильтром -->
+            <!-- Улица с мягким тёплым фильтром -->
             <Grid IsVisible="False">
                 <Grid.Triggers>
                     <DataTrigger TargetType="Grid" Binding="{Binding IsOutside}" Value="True">
@@ -46,10 +47,10 @@
                 </Rectangle>
             </Grid>
 
-            <!-- Игровая зона поверх фонов -->
+            <!-- ===== ИГРОВАЯ ЗОНА ===== -->
             <AbsoluteLayout x:Name="PlayArea">
 
-                <!-- Слой мини-игры (падающие предметы) -->
+                <!-- Слой мини-игры “падающие предметы” (поверх фона, под котом) -->
                 <AbsoluteLayout x:Name="FallLayer"
                                 IsVisible="False"
                                 AbsoluteLayout.LayoutBounds="0,0,1,1"
@@ -62,66 +63,54 @@
                        TranslationX="{Binding CatX}"
                        TranslationY="{Binding CatY}">
                     <Image.GestureRecognizers>
+                        <!-- тап: в комнате — свободно; на улице — только по X -->
                         <TapGestureRecognizer NumberOfTapsRequired="1" Tapped="OnPlayAreaTapped"/>
-                        <!-- На улице — горизонтальный pan -->
+                        <!-- пан по X на улице -->
                         <PanGestureRecognizer PanUpdated="OnPanOutside"/>
                     </Image.GestureRecognizers>
                 </Image>
 
-                <!-- Drop + Tap на всю площадь -->
+                <!-- Жесты на всю площадь -->
                 <AbsoluteLayout.GestureRecognizers>
-                    <DropGestureRecognizer Drop="OnDropToy" />
                     <TapGestureRecognizer NumberOfTapsRequired="1" Tapped="OnPlayAreaTapped"/>
                 </AbsoluteLayout.GestureRecognizers>
 
             </AbsoluteLayout>
         </Grid>
 
-        <!-- Нижняя панель: дверь + лапа + мини-игра + игрушки -->
+        <!-- ===== НИЖНЯЯ ПАНЕЛЬ: ДВЕРЬ + ЛАПКА ===== -->
         <Grid Grid.Row="1"
-      ColumnDefinitions="Auto,Auto,Auto,*"
-      HeightRequest="110"
-      Padding="10,6"
-      ColumnSpacing="12">
+              ColumnDefinitions="Auto,Auto"
+              HeightRequest="110"
+              Padding="10,6"
+              ColumnSpacing="12">
 
-            <!-- Дверь -->
+            <!-- Дверь (переключение Комната/Улица) -->
             <VerticalStackLayout Spacing="4" VerticalOptions="Center">
                 <ImageButton Source="door.png"
-                 WidthRequest="56" HeightRequest="56"
-                 BackgroundColor="Transparent"
-                 Command="{Binding ToggleLocationCommand}"
-                 SemanticProperties.Hint="Toggle location"/>
-                <Label Text="{x:Static Member=res:AppResources.Door}"
-           FontSize="12"
-           HorizontalTextAlignment="Center"
-           Opacity="0.8"/>
+                             WidthRequest="56" HeightRequest="56"
+                             BackgroundColor="Transparent"
+                             Command="{Binding ToggleLocationCommand}"
+                             SemanticProperties.Hint="Toggle location"/>
+                <Label Text="Door"
+                       FontSize="12"
+                       HorizontalTextAlignment="Center"
+                       Opacity="0.8"/>
             </VerticalStackLayout>
 
-            <!-- Лапа -> TicTacToe -->
+            <!-- Лапка — открыть крестики-нолики -->
             <VerticalStackLayout Grid.Column="1" Spacing="4" VerticalOptions="Center">
                 <ImageButton Source="paw.png"
-                 WidthRequest="56" HeightRequest="56"
-                 BackgroundColor="Transparent"
-                 Clicked="OnOpenTicTacToe"
-                 SemanticProperties.Hint="Open Tic-Tac-Toe"/>
+                             WidthRequest="56" HeightRequest="56"
+                             BackgroundColor="Transparent"
+                             Clicked="OnOpenTicTacToe"
+                             SemanticProperties.Hint="Open Tic-Tac-Toe"/>
                 <Label Text="TicTacToe"
-           FontSize="12"
-           HorizontalTextAlignment="Center"
-           Opacity="0.8"/>
+                       FontSize="12"
+                       HorizontalTextAlignment="Center"
+                       Opacity="0.8"/>
             </VerticalStackLayout>
 
-            <!-- Мини-игра (Play/Stop) -->
-            <VerticalStackLayout Grid.Column="2" Spacing="2" VerticalOptions="Center">
-                <!-- ВАЖНО: x:Name="MiniBtn" -->
-                <Button x:Name="MiniBtn"
-            Text="Play"
-            Command="{Binding ToggleMiniGameCommand}"
-            IsEnabled="{Binding IsOutside}" />
-                <HorizontalStackLayout Spacing="10" HorizontalOptions="Center">
-                    <Label Text="{Binding MiniScore, StringFormat='Score: {0}'}" FontSize="12" />
-                    <Label Text="{Binding MiniTimeLeft, StringFormat='{0}s'}" FontSize="12" />
-                </HorizontalStackLayout>
-            </VerticalStackLayout>
         </Grid>
 
     </Grid>

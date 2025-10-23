@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel;
+using System.Runtime.CompilerServices;
 using System.Windows.Input;
 using CatWorld.Services;
 
@@ -7,71 +8,83 @@ namespace CatWorld.ViewModels;
 public class SettingsViewModel : INotifyPropertyChanged
 {
     public event PropertyChangedEventHandler? PropertyChanged;
-    void OnPropertyChanged(string n) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(n));
+    void OnPropertyChanged([CallerMemberName] string? n = null)
+        => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(n));
 
-    private readonly IThemeService _theme;
-    private readonly ILocalizationService _loc;
     private readonly ISettingsService _settings;
-    private readonly IAudioService _audio;
+    private readonly ILocalizationService _loc;
 
-    public SettingsViewModel(
-        IThemeService theme,
-        ILocalizationService loc,
-        ISettingsService settings,
-        IAudioService audio)
+    public SettingsViewModel(ISettingsService settings, ILocalizationService loc)
     {
-        _theme = theme;
-        _loc = loc;
         _settings = settings;
-        _audio = audio;
+        _loc = loc;
 
-        _audio.IsEnabled = settings.SoundEnabled;
+        // загрузить сохранённые значения
+        SelectedLanguage = _settings.LanguageCode;          // "et"/"en"/"ru"
+        NightStart = _settings.NightStart;                  // TimeSpan
+        NightEnd = _settings.NightEnd;
 
-        SetLightCommand = new Command(() => _theme.Apply(AppTheme.Light));
-        SetDarkCommand = new Command(() => _theme.Apply(AppTheme.Dark));
-        SetLanguageCommand = new Command<string>(lang => SelectedLanguage = lang);
+        SetLanguageCommand = new Command<string>(code => { SelectedLanguage = code; ApplyLanguage(); SaveLanguage(); });
+        SaveNightCommand = new Command(SaveNightSchedule);
     }
 
-    // --- ЯЗЫК ---
+    // ===== Язык =====
+    string _selectedLanguage = "en";
     public string SelectedLanguage
     {
-        get => _settings.Language;        
-        set
-        {
-            if (_settings.Language != value)
-            {
-                _settings.Language = value;
-                _loc.SetCulture(value);
-                OnPropertyChanged(nameof(SelectedLanguage));
-                OnPropertyChanged(nameof(IsEn));
-                OnPropertyChanged(nameof(IsEt));
-                OnPropertyChanged(nameof(IsRu));
-            }
-        }
+        get => _selectedLanguage;
+        set { if (_selectedLanguage != value) { _selectedLanguage = value; OnPropertyChanged(); OnPropertyChanged(nameof(CurrentLanguageDisplay)); } }
     }
 
-    // для подсветки выбранного флага
-    public bool IsEn => SelectedLanguage == "en";
-    public bool IsEt => SelectedLanguage == "et";
-    public bool IsRu => SelectedLanguage == "ru";
-
-    // --- ЗВУК ---
-    public bool SoundEnabled
+    public string CurrentLanguageDisplay => SelectedLanguage switch
     {
-        get => _settings.SoundEnabled;
-        set
-        {
-            if (_settings.SoundEnabled != value)
-            {
-                _settings.SoundEnabled = value;
-                _audio.IsEnabled = value;
-                OnPropertyChanged(nameof(SoundEnabled));
-            }
-        }
+        "et" => "Eesti keel",
+        "ru" => "Русский",
+        _ => "English",
+    };
+
+    public ICommand SetLanguageCommand { get; }
+
+    void ApplyLanguage()
+    {
+        // применяем сразу
+        _loc.SetCulture(SelectedLanguage);
     }
 
-    // --- Команды ---
-    public ICommand SetLightCommand { get; }
-    public ICommand SetDarkCommand { get; }
-    public ICommand SetLanguageCommand { get; }
+    void SaveLanguage()
+    {
+        _settings.LanguageCode = SelectedLanguage;
+        _settings.Flush();
+    }
+
+    // ===== Ночной режим (расписание) =====
+    TimeSpan _nightStart;
+    public TimeSpan NightStart
+    {
+        get => _nightStart;
+        set { if (_nightStart != value) { _nightStart = value; OnPropertyChanged(); } }
+    }
+
+    TimeSpan _nightEnd;
+    public TimeSpan NightEnd
+    {
+        get => _nightEnd;
+        set { if (_nightEnd != value) { _nightEnd = value; OnPropertyChanged(); } }
+    }
+
+    string _saveStatus = "";
+    public string SaveStatus { get => _saveStatus; set { _saveStatus = value; OnPropertyChanged(); } }
+
+    public ICommand SaveNightCommand { get; }
+
+    void SaveNightSchedule()
+    {
+        _settings.NightStart = NightStart;
+        _settings.NightEnd = NightEnd;
+        _settings.Flush();
+        SaveStatus = $"Ночной режим: {NightStart:hh\\:mm}-{NightEnd:hh\\:mm} ✓";
+
+        // пинганём слушателей (например, GameViewModel), что расписание изменилось
+        _settings.RaiseSettingsChanged();
+    }
 }
