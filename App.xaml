@@ -1,16 +1,22 @@
-﻿<?xml version="1.0" encoding="utf-8" ?>
+﻿<?xml version="1.0" encoding="UTF-8" ?>
 <Application
     x:Class="CatWorld.App"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml">
 
     <Application.Resources>
-        <Color x:Key="BgColorLight">#FFFFFF</Color>
-        <Color x:Key="BgColorDark">#1C1C1E</Color>
+        <ResourceDictionary>
 
-        <Style TargetType="ContentPage">
-            <Setter Property="BackgroundColor"
-              Value="{AppThemeBinding Light={StaticResource BgColorLight}, Dark={StaticResource BgColorDark}}" />
-        </Style>
+            <!-- ПОДСТАВЬ СВОИ ФАЙЛЫ -->
+            <x:String x:Key="Bg_DayPath">Resources/Images/bg_day.png</x:String>
+            <x:String x:Key="Bg_NightPath">Resources/Images/bg_night.png</x:String>
+            <x:String x:Key="Cat_AwakePath">Resources/Images/cat_awake.png</x:String>
+            <x:String x:Key="Cat_SleepPath">Resources/Images/cat_sleep.png</x:String>
+
+            <!-- Текущие (переключаются кодом) -->
+            <x:String x:Key="Bg_CurrentPath">Resources/Images/bg_day.png</x:String>
+            <x:String x:Key="Cat_CurrentPath">Resources/Images/cat_awake.png</x:String>
+
+        </ResourceDictionary>
     </Application.Resources>
 </Application>

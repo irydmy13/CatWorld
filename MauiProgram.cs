@@ -26,6 +26,9 @@ public static class MauiProgram
         builder.Services.AddSingleton<IThemeService, ThemeService>();
         builder.Services.AddSingleton<ILocalizationService, LocalizationService>();
         builder.Services.AddSingleton<ISettingsService, SettingsService>();
+        builder.Services.AddSingleton<INightModeService, NightModeService>();
+        builder.Services.AddSingleton<ICoinsService, CoinsService>();
+
 
         // ViewModels
         builder.Services.AddTransient<GameViewModel>();

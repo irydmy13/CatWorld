@@ -4,60 +4,50 @@ namespace CatWorld.Services;
 
 public class SettingsService : ISettingsService
 {
-    // Ключи для Preferences
-    const string KeySoundEnabled = "SoundEnabled";
-    const string KeyVolume = "Volume";
-    const string KeyLang = "LanguageCode";
-
-    const string KeyNightStart = "NightStartMin"; // минуты с 00:00
-    const string KeyNightEnd = "NightEndMin";
-
-    const string KeyMiniStartX = "MiniStartX";
-    const string KeyMiniTrackY = "MiniTrackY";
-
     public bool SoundEnabled
     {
-        get => Preferences.Get(KeySoundEnabled, true);
-        set { Preferences.Set(KeySoundEnabled, value); RaiseSettingsChanged(); }
+        get => Preferences.Get(nameof(SoundEnabled), true);
+        set => Preferences.Set(nameof(SoundEnabled), value);
     }
 
     public double Volume
     {
-        get => Preferences.Get(KeyVolume, 0.7);
-        set { Preferences.Set(KeyVolume, Math.Clamp(value, 0, 1)); RaiseSettingsChanged(); }
+        get => Preferences.Get(nameof(Volume), 0.8);
+        set => Preferences.Set(nameof(Volume), value);
     }
 
     public string LanguageCode
     {
-        get => Preferences.Get(KeyLang, "en");
-        set { Preferences.Set(KeyLang, string.IsNullOrWhiteSpace(value) ? "en" : value); RaiseSettingsChanged(); }
+        get => Preferences.Get(nameof(LanguageCode), "en");
+        set => Preferences.Set(nameof(LanguageCode), value ?? "en");
     }
 
+    // храним в минутах от полуночи
     public TimeSpan NightStart
     {
-        get => TimeSpan.FromMinutes(Preferences.Get(KeyNightStart, 21 * 60)); // 21:00
-        set { Preferences.Set(KeyNightStart, (int)value.TotalMinutes); RaiseSettingsChanged(); }
+        get => TimeSpan.FromMinutes(Preferences.Get(nameof(NightStart) + "_min", 21 * 60));
+        set => Preferences.Set(nameof(NightStart) + "_min", (int)value.TotalMinutes);
     }
 
     public TimeSpan NightEnd
     {
-        get => TimeSpan.FromMinutes(Preferences.Get(KeyNightEnd, 8 * 60)); // 08:00
-        set { Preferences.Set(KeyNightEnd, (int)value.TotalMinutes); RaiseSettingsChanged(); }
+        get => TimeSpan.FromMinutes(Preferences.Get(nameof(NightEnd) + "_min", 8 * 60));
+        set => Preferences.Set(nameof(NightEnd) + "_min", (int)value.TotalMinutes);
     }
 
     public double MiniStartX
     {
-        get => Preferences.Get(KeyMiniStartX, 0.0);
-        set { Preferences.Set(KeyMiniStartX, value); RaiseSettingsChanged(); }
+        get => Preferences.Get(nameof(MiniStartX), 0.0);
+        set => Preferences.Set(nameof(MiniStartX), value);
     }
 
     public double MiniTrackY
     {
-        get => Preferences.Get(KeyMiniTrackY, 120.0);
-        set { Preferences.Set(KeyMiniTrackY, value); RaiseSettingsChanged(); }
+        get => Preferences.Get(nameof(MiniTrackY), 0.0);
+        set => Preferences.Set(nameof(MiniTrackY), value);
     }
 
-    public void Flush() { /* Preferences пишут сразу; ничего делать не нужно */ }
+    public void Flush() { /* Preferences уже сохраняет */ }
 
     public event EventHandler? SettingsChanged;
     public void RaiseSettingsChanged() => SettingsChanged?.Invoke(this, EventArgs.Empty);

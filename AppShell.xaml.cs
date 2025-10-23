@@ -1,10 +1,14 @@
-﻿namespace CatWorld
+﻿using CatWorld.Views;
+
+namespace CatWorld;
+
+public partial class AppShell : Shell
 {
-    public partial class AppShell : Shell
+    public AppShell()
     {
-        public AppShell()
-        {
-            InitializeComponent();
-        }
+        InitializeComponent();
+
+        // чтобы Shell.GoToAsync(nameof(TicTacToePage)) работал:
+        Routing.RegisterRoute(nameof(TicTacToePage), typeof(TicTacToePage));
     }
 }

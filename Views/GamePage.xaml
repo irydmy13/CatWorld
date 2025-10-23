@@ -2,14 +2,12 @@
 <ContentPage x:Class="CatWorld.Views.GamePage"
              xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             xmlns:res="clr-namespace:CatWorld.Resources.Localization"
-             Title="{x:Static res:AppResources.Title}">
+             Title="CatWorld">
 
     <Grid RowDefinitions="*,Auto">
 
         <!-- ===== ФОНЫ ===== -->
         <Grid Grid.Row="0">
-
             <!-- Комната (день/ночь) -->
             <Image Aspect="AspectFill"
                    InputTransparent="True"
@@ -21,7 +19,7 @@
                 </Image.Triggers>
             </Image>
 
-            <!-- Улица с мягким тёплым фильтром -->
+            <!-- Улица -->
             <Grid IsVisible="False">
                 <Grid.Triggers>
                     <DataTrigger TargetType="Grid" Binding="{Binding IsOutside}" Value="True">
@@ -29,13 +27,9 @@
                     </DataTrigger>
                 </Grid.Triggers>
 
-                <Image Aspect="AspectFill"
-                       InputTransparent="True"
-                       Source="bg_street.png" />
-
-                <!-- тёплый оверлей + лёгкая виньетка -->
-                <BoxView InputTransparent="True"
-                         Opacity="0.18"
+                <Image Aspect="AspectFill" InputTransparent="True" Source="bg_street.png"/>
+                <!-- Тёплый фильтр + лёгкая виньетка -->
+                <BoxView InputTransparent="True" Opacity="0.18"
                          BackgroundColor="{AppThemeBinding Light=#FFEFD8, Dark=#1A1A1A}" />
                 <Rectangle InputTransparent="True" Opacity="0.35">
                     <Rectangle.Fill>
@@ -50,12 +44,6 @@
             <!-- ===== ИГРОВАЯ ЗОНА ===== -->
             <AbsoluteLayout x:Name="PlayArea">
 
-                <!-- Слой мини-игры “падающие предметы” (поверх фона, под котом) -->
-                <AbsoluteLayout x:Name="FallLayer"
-                                IsVisible="False"
-                                AbsoluteLayout.LayoutBounds="0,0,1,1"
-                                AbsoluteLayout.LayoutFlags="All" />
-
                 <!-- Кот -->
                 <Image x:Name="Cat"
                        Source="cat.png"
@@ -63,54 +51,75 @@
                        TranslationX="{Binding CatX}"
                        TranslationY="{Binding CatY}">
                     <Image.GestureRecognizers>
-                        <!-- тап: в комнате — свободно; на улице — только по X -->
-                        <TapGestureRecognizer NumberOfTapsRequired="1" Tapped="OnPlayAreaTapped"/>
-                        <!-- пан по X на улице -->
+                        <TapGestureRecognizer Tapped="OnPlayAreaTapped"/>
+                        <!-- на улице — горизонтальный pan -->
                         <PanGestureRecognizer PanUpdated="OnPanOutside"/>
                     </Image.GestureRecognizers>
                 </Image>
 
-                <!-- Жесты на всю площадь -->
+                <!-- Drop + Tap по всей области -->
                 <AbsoluteLayout.GestureRecognizers>
-                    <TapGestureRecognizer NumberOfTapsRequired="1" Tapped="OnPlayAreaTapped"/>
+                    <DropGestureRecognizer Drop="OnDropToy" />
+                    <TapGestureRecognizer Tapped="OnPlayAreaTapped"/>
                 </AbsoluteLayout.GestureRecognizers>
 
             </AbsoluteLayout>
         </Grid>
 
-        <!-- ===== НИЖНЯЯ ПАНЕЛЬ: ДВЕРЬ + ЛАПКА ===== -->
+        <!-- ===== НИЖНЯЯ ПАНЕЛЬ: Дверь + Лапа (TicTacToe) + Игрушки ===== -->
         <Grid Grid.Row="1"
-              ColumnDefinitions="Auto,Auto"
+              ColumnDefinitions="Auto,Auto,*"
               HeightRequest="110"
               Padding="10,6"
               ColumnSpacing="12">
 
-            <!-- Дверь (переключение Комната/Улица) -->
+            <!-- Дверь -->
             <VerticalStackLayout Spacing="4" VerticalOptions="Center">
                 <ImageButton Source="door.png"
                              WidthRequest="56" HeightRequest="56"
                              BackgroundColor="Transparent"
-                             Command="{Binding ToggleLocationCommand}"
-                             SemanticProperties.Hint="Toggle location"/>
+                             Command="{Binding ToggleLocationCommand}"/>
                 <Label Text="Door"
                        FontSize="12"
                        HorizontalTextAlignment="Center"
                        Opacity="0.8"/>
             </VerticalStackLayout>
 
-            <!-- Лапка — открыть крестики-нолики -->
+            <!-- Лапа → крестики-нолики -->
             <VerticalStackLayout Grid.Column="1" Spacing="4" VerticalOptions="Center">
                 <ImageButton Source="paw.png"
                              WidthRequest="56" HeightRequest="56"
                              BackgroundColor="Transparent"
-                             Clicked="OnOpenTicTacToe"
-                             SemanticProperties.Hint="Open Tic-Tac-Toe"/>
-                <Label Text="TicTacToe"
+                             Clicked="OnOpenTicTacToe"/>
+                <Label Text="Tic-Tac-Toe"
                        FontSize="12"
                        HorizontalTextAlignment="Center"
                        Opacity="0.8"/>
             </VerticalStackLayout>
 
+            <!-- Игрушки -->
+            <CollectionView Grid.Column="2"
+                            ItemsSource="{Binding Toys}"
+                            ItemsLayout="HorizontalList"
+                            Margin="0">
+                <CollectionView.ItemTemplate>
+                    <DataTemplate>
+                        <Grid Padding="6">
+                            <Frame Padding="8" HasShadow="True" CornerRadius="12">
+                                <VerticalStackLayout>
+                                    <Image Source="{Binding Icon}" WidthRequest="64" HeightRequest="64">
+                                        <Image.GestureRecognizers>
+                                            <DragGestureRecognizer CanDrag="True"
+                                                                   DragStarting="OnToyDragStarting"/>
+                                        </Image.GestureRecognizers>
+                                    </Image>
+                                    <Label Text="{Binding Name}" HorizontalOptions="Center"/>
+                                </VerticalStackLayout>
+                            </Frame>
+                        </Grid>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
         </Grid>
 
     </Grid>

@@ -9,7 +9,7 @@
 
     <TabBar>
         <ShellContent Title="{x:Static res:AppResources.Title}" ContentTemplate="{DataTemplate views:GamePage}" />
-        <ShellContent Title="{x:Static res:AppResources.Settings}" ContentTemplate="{DataTemplate views:SettingsPage}" />
+        <ShellContent Title="{x:Static res:AppResources.Settings}" ContentTemplate="{DataTemplate views:SettingsPage}" Route="settings"  />
         <ShellContent Title="{x:Static res:AppResources.Stats}" ContentTemplate="{DataTemplate views:StatsPage}" />
     </TabBar>
 </Shell>

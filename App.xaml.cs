@@ -1,14 +1,34 @@
 ﻿using CatWorld.Services;
-using CatWorld.Views;
-using Microsoft.Maui.Controls;
+
 namespace CatWorld;
 
 public partial class App : Application
 {
-    public App(IThemeService themeService)
+    private readonly INightModeService _nightMode;
+
+    public App(INightModeService nightMode)
     {
         InitializeComponent();
-        themeService.Apply(ThemeService.LoadSavedOrDefault());
+        _nightMode = nightMode;
+
         MainPage = new AppShell();
+        ApplyNightThemeIfNeeded();
+    }
+
+    private void ApplyNightThemeIfNeeded()
+    {
+        UserAppTheme = _nightMode.IsNightNow() ? AppTheme.Dark : AppTheme.Light;
+    }
+
+    protected override void OnStart()
+    {
+        base.OnStart();
+        ApplyNightThemeIfNeeded();
+    }
+
+    protected override void OnResume()
+    {
+        base.OnResume();
+        ApplyNightThemeIfNeeded();
     }
 }

@@ -1,15 +1,15 @@
-﻿namespace CatWorld.Services
-{
-    public interface ICoinsService
-    {
-        int Coins { get; }
-        void Add(int delta);
-    }
+﻿using Microsoft.Maui.Storage;
 
-    public class CoinsService : ICoinsService
+namespace CatWorld.Services;
+
+public class CoinsService : ICoinsService
+{
+    const string Key = "coins";
+    public int Coins => Preferences.Get(Key, 0);
+
+    public void Add(int amount)
     {
-        const string Key = "coins";
-        public int Coins => Preferences.Get(Key, 0);
-        public void Add(int delta) => Preferences.Set(Key, Math.Max(0, Coins + delta));
+        var v = Math.Max(0, Coins + amount);
+        Preferences.Set(Key, v);
     }
 }

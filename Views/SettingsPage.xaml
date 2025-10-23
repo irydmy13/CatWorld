@@ -1,57 +1,33 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<ContentPage x:Class="CatWorld.Views.SettingsPage"
-             xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
-             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             Title="Settings">
+<ContentPage
+    x:Class="CatWorld.Views.SettingsPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    Title="Settings">
 
     <ScrollView>
-        <VerticalStackLayout Padding="16" Spacing="18">
+        <VerticalStackLayout Padding="16" Spacing="16">
 
-            <!-- ЯЗЫК -->
-            <Frame Padding="12" CornerRadius="12" HasShadow="True">
-                <VerticalStackLayout Spacing="10">
-                    <Label Text="Language / Keel / Язык"
-                           FontSize="18"
-                           FontAttributes="Bold"/>
+            <Grid ColumnDefinitions="Auto,*" ColumnSpacing="12">
+                <Label Text="Night schedule"/>
+                <Switch Grid.Column="1" IsToggled="{Binding NightScheduleEnabled}"/>
+            </Grid>
 
-                    <!-- именно Clicked / Command работает на ImageButton без хитбоксов вокруг -->
-                    <HorizontalStackLayout Spacing="14">
-                        <ImageButton Source="flag_et.png" WidthRequest="48" HeightRequest="34"
-                                     BackgroundColor="Transparent"
-                                     Command="{Binding SetLanguageCommand}" CommandParameter="et" />
-                        <ImageButton Source="flag_en.png" WidthRequest="48" HeightRequest="34"
-                                     BackgroundColor="Transparent"
-                                     Command="{Binding SetLanguageCommand}" CommandParameter="en" />
-                        <ImageButton Source="flag_ru.png" WidthRequest="48" HeightRequest="34"
-                                     BackgroundColor="Transparent"
-                                     Command="{Binding SetLanguageCommand}" CommandParameter="ru" />
-                    </HorizontalStackLayout>
-
-                    <Label Text="{Binding CurrentLanguageDisplay}" Opacity="0.7" FontSize="13"/>
+            <Grid ColumnDefinitions="*,*" ColumnSpacing="16" IsEnabled="{Binding NightScheduleEnabled}">
+                <VerticalStackLayout>
+                    <Label Text="Start"/>
+                    <TimePicker Time="{Binding NightStart}"/>
                 </VerticalStackLayout>
-            </Frame>
-
-            <!-- НОЧНОЙ РЕЖИМ ПО ВРЕМЕНИ -->
-            <Frame Padding="12" CornerRadius="12" HasShadow="True">
-                <VerticalStackLayout Spacing="10">
-                    <Label Text="Ночной режим (время)"
-                           FontSize="18" FontAttributes="Bold"/>
-                    <Grid ColumnDefinitions="Auto,*,Auto,*" ColumnSpacing="8">
-                        <Label Grid.Column="0" Text="C:" VerticalTextAlignment="Center"/>
-                        <TimePicker Grid.Column="1"
-                                    Time="{Binding NightStart, Mode=TwoWay}"
-                                    Format="HH:mm" />
-                        <Label Grid.Column="2" Text="До:" VerticalTextAlignment="Center"/>
-                        <TimePicker Grid.Column="3"
-                                    Time="{Binding NightEnd, Mode=TwoWay}"
-                                    Format="HH:mm" />
-                    </Grid>
-                    <Button Text="Сохранить ночной режим" Command="{Binding SaveNightCommand}" />
-                    <Label Text="{Binding SaveStatus}" FontSize="12" Opacity="0.7"/>
-                    <Label Text="Во время ночи: комната — ночной фон, кот спит; улица — ночной фон, кота нет; игры отключены." FontSize="12" Opacity="0.6"/>
+                <VerticalStackLayout>
+                    <Label Text="End"/>
+                    <TimePicker Time="{Binding NightEnd}"/>
                 </VerticalStackLayout>
-            </Frame>
+            </Grid>
 
+            <Button Text="Save" Command="{Binding SaveCommand}"/>
+
+            <Label FontSize="12" Opacity="0.7"
+                   Text="Tip: If Start > End, schedule spans midnight (e.g., 22:00–07:00)." />
         </VerticalStackLayout>
     </ScrollView>
 </ContentPage>

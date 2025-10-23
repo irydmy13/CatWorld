@@ -2,23 +2,22 @@
 
 public interface ISettingsService
 {
-    // Уже существующие/нужные настройки
+    // существующие у тебя поля
     bool SoundEnabled { get; set; }
     double Volume { get; set; }
-    string LanguageCode { get; set; }   // "en" | "et" | "ru"
+    string LanguageCode { get; set; }
 
-    // Ночной режим по расписанию
+    // расписание ночи
     TimeSpan NightStart { get; set; }   // по умолчанию 21:00
     TimeSpan NightEnd { get; set; }   // по умолчанию 08:00
 
-    // Мини-игра (улица)
+    // мини-игра
     double MiniStartX { get; set; }
     double MiniTrackY { get; set; }
 
-    // На Preferences можно не писать явно, но оставим для совместимости
     void Flush();
 
-    // Сигнал «настройки изменились» (чтобы VM могли пересчитать состояние)
+    // нотификация об изменении настроек
     event EventHandler? SettingsChanged;
     void RaiseSettingsChanged();
 }
